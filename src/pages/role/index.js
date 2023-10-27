@@ -19,7 +19,7 @@ import {
   IconButton,
   TableHead,
   TableContainer,
-  TablePagination,
+  Pagination
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -58,11 +58,13 @@ export default function Role() {
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
   const [record, setRecord] = useState()
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
+  const [size] = useState(15);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const setOpenPopup = () => {
     setOpen((add) => !add);
@@ -72,16 +74,6 @@ export default function Role() {
   }
   const setEditOpenPopup = () => {
     setEditOpen((add) => !add);
-  };
-
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   const callApi = () => {
@@ -94,11 +86,11 @@ export default function Role() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}role`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}role?page=${page}&size=${size}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          console.log(data)
+          // console.log(data)
           if (data?.dataItems && data?.dataItems.length > 0) {
 
             const rolesWithPermissions = data?.dataItems.map(role => {
@@ -106,6 +98,8 @@ export default function Role() {
               return { ...role, new_permission: permissionNames.join(', ') };
             });
             setdataShow(rolesWithPermissions)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
             // console.log(rolesWithPermissions);
           } else {
             if (data?.message === 'Please login first') {
@@ -118,14 +112,15 @@ export default function Role() {
             navigate('/logout')
           }
           toast.error(error?.message)
-          console.log(error)
         });
     } else {
       setLoader(false)
       navigate('/logout')
 
-      console.log('here')
     }
+  }
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
   }
 
   useEffect(() => {
@@ -134,7 +129,8 @@ export default function Role() {
       navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [page])
+  
   const handleDelete = (id) => {
     console.log('delete')
     const requestOptions = {
@@ -226,15 +222,17 @@ export default function Role() {
               </TableContainer>
             </Scrollbar>
 
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
           </Card>
           <Popup title="Add Role" openPopup={open} setOpenPopup={setOpenPopup}>
             <RoleAdd popup={open} popupChange={handleClickClose} accessToken={token} />

@@ -52,6 +52,7 @@ export default function LoginForm() {
           }
         })
         .catch((error) => {
+          setbtnLoad(false);
           toast.error(error?.message);
         });
 
