@@ -31,7 +31,6 @@ export default function Filter(props) {
         setValues(prevState => ({ ...prevState, [parm]: e.target.value }))
     }
     const changeSelectValue = (value, parm) => {
-        console.log("hello", value, " --- ", parm)
         setValues(prevState => ({ ...prevState, [parm]: value }))
     }
     const filterdata = () => {
@@ -74,34 +73,36 @@ export default function Filter(props) {
     }
     const handleArea = (id) => {
         const areas = cityData.find(item => item.id === id);
-        console.log("areas :", areas)
         setSelectedArea({})
         setAreaData(areas ? areas.areas : []);
     }
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6} >
-                {!account?.state?.id ? <Autocomplete
-                    id="state"
-                    options={states}
-                    value={selectedState}
-                    size="small"
-                    getOptionLabel={(option) => option?.name || ''}
-                    onChange={(event, newValue) => {
-                        setSelectedState(newValue ? newValue : {})
-                        changeSelectValue(newValue ? newValue.id : '', 'state_id')
-                        handleCity(newValue ? newValue.id : 0)
-                    }}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            variant="outlined"
-                            label="Select State"
-                            placeholder="States"
-                        />
-                    )}
-                /> : ''}
-            </Grid>
+
+            {!account?.state?.id ?
+                <Grid item xs={12} md={6} lg={6} >
+                    <Autocomplete
+                        id="state"
+                        options={states}
+                        value={selectedState}
+                        size="small"
+                        getOptionLabel={(option) => option?.name || ''}
+                        onChange={(event, newValue) => {
+                            setSelectedState(newValue ? newValue : {})
+                            changeSelectValue(newValue ? newValue.id : '', 'state_id')
+                            handleCity(newValue ? newValue.id : 0)
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="outlined"
+                                label="Select State"
+                                placeholder="States"
+                            />
+                        )}
+                    />
+                </Grid> : ''}
+
             <Grid item xs={12} md={6} lg={6} >
                 <Autocomplete
                     id="city"

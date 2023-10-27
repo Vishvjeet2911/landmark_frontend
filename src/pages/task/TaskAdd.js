@@ -6,7 +6,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import {
     Stack,
     TextField,
-    Button, Box, FormControl, InputLabel, MenuItem, Select
+    Button
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
@@ -16,8 +16,6 @@ import { permission_check } from 'src/_mock/permission_check';
 export default function TaskAdd(props) {
     const navigate = useNavigate();
     const [btnLoad, setbtnLoad] = useState(false);
-    const [value, setValue] = useState('');
-    const [permissionData, setPermissionData] = useState([]);
     const [selectedPeople, setSelectedPeople] = useState([])
     const currentDate = new Date();
     const minDate = currentDate.toISOString().split('T')[0]; 
@@ -46,7 +44,6 @@ export default function TaskAdd(props) {
         enableReinitialize: true,
         validationSchema: LoginSchema,
         onSubmit: (initialValues) => {
-            console.log(initialValues)
             setbtnLoad(true)
             const requestOptions = {
                 method: "POST",
@@ -184,10 +181,3 @@ export default function TaskAdd(props) {
         </FormikProvider>
     );
 }
-const top100Films = [
-    { name: 'User Add', id: 1 },
-    { name: 'User Edit', id: 2 },
-    { name: 'User Delete', id: 3 },
-    { name: 'Read', id: 4 },
-    { name: 'All', id: 5 },
-];

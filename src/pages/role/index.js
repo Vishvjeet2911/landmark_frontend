@@ -90,7 +90,6 @@ export default function Role() {
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          // console.log(data)
           if (data?.dataItems && data?.dataItems.length > 0) {
 
             const rolesWithPermissions = data?.dataItems.map(role => {
@@ -100,7 +99,6 @@ export default function Role() {
             setdataShow(rolesWithPermissions)
             setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
             setTotalRecords(data?.totalItems);
-            // console.log(rolesWithPermissions);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
@@ -132,7 +130,6 @@ export default function Role() {
   }, [page])
   
   const handleDelete = (id) => {
-    console.log('delete')
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -143,14 +140,13 @@ export default function Role() {
     fetch(`${process.env.REACT_APP_SITE_URL}role/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         toast.success('Delete Successfully')
         const newArray = showData.filter((item) => (
           item._id !== id
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
+        toast.error(error?.message)
       });
   }
 

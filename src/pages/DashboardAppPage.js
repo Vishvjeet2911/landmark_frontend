@@ -47,7 +47,6 @@ export default function DashboardAppPage() {
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          console.log('hey', data)
           if (data && data?.length > 0) {
             setdataShow(data)
           } else {

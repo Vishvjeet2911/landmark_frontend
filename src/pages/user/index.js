@@ -127,7 +127,6 @@ export default function User() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
   const handleDelete = (id) => {
-    console.log('delete')
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -138,19 +137,17 @@ export default function User() {
     fetch(`${process.env.REACT_APP_SITE_URL}user/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         toast.success('Delete Successfully')
         const newArray = showData.filter((item) => (
           item._id !== id
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
+        toast.error(error?.message)
       });
   }
 
   const handleEditClick = (row) => {
-    console.log("row : ", row)
     setRecord(row)
     setEditOpen(true)
   }

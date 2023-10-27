@@ -48,7 +48,6 @@ export default function PropertyAdd() {
         fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log("data : ", data)
                 setStateData(data?.data?.states)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +73,6 @@ export default function PropertyAdd() {
         }
     }, []);
     const onDeleteImage = (index) => {
-        console.log(uploadedImages)
         setUploadedImages((prevImages) => {
             const updatedImages = [...prevImages];
             updatedImages.splice(index, 1); // Remove one element at the specified index
@@ -180,7 +178,6 @@ export default function PropertyAdd() {
     }
     const handleArea = (id) => {
         const areas = cityData.find(item => item.id === id);
-        console.log("areas :", areas)
         setSelectedArea({})
         setAreaData(areas ? areas.areas : []);
     }
@@ -195,10 +192,8 @@ export default function PropertyAdd() {
             reader.onload = (e) => {
                 setSelectedFile(e.target.result);
             };
-            console.log(" file : ", file)
             reader.readAsDataURL(file);
         }
-        console.log("values : ", values)
         const objectUrl = URL.createObjectURL(e.target.files[0])
         setPreview(objectUrl)
     }
@@ -218,7 +213,6 @@ export default function PropertyAdd() {
                                 getOptionLabel={(option) => option?.name || ''}
                                 onChange={(event, newValue) => {
                                     setSelectedState(newValue ? newValue : {})
-                                    console.log("state_id", newValue?.id, " -- ", newValue?.name)
                                     setFieldValue("state_id", newValue?.id);
                                     handleCity(newValue ? newValue.id : 0)
                                 }}
@@ -243,7 +237,6 @@ export default function PropertyAdd() {
                                 onChange={(event, newValue) => {
                                     setSelectedCity(newValue ? newValue : {})
                                     setFieldValue("city_id", newValue?.id);
-                                    console.log("city_id", newValue?.id, " -- ", newValue?.name)
                                     handleArea(newValue ? newValue.id : 0)
                                 }}
                                 renderInput={(params) => (
@@ -266,7 +259,6 @@ export default function PropertyAdd() {
                                 getOptionLabel={(option) => option?.name || ''}
                                 onChange={(event, newValue) => {
                                     setSelectedArea(newValue ? newValue : {})
-                                    console.log("area_id", newValue?.id, " -- ", newValue?.name)
                                     setFieldValue("area_id", newValue?.id);
                                 }}
                                 renderInput={(params) => (

@@ -29,7 +29,7 @@ import {
   IconButton,
   TableHead,
   TableContainer,
-  TablePagination,
+  Pagination,
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -68,14 +68,17 @@ export default function Area() {
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
   const [record, setRecord] = useState()
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [importLoad, setImportLoad] = useState(false);
   const [openConfirmPending, setOpenConfirmPending] = useState(false);
   const [fileImport, setFileImport] = useState(null);
+  const [page, setPage] = useState(0);
+  const [size] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   const setOpenPopup = () => {
     setOpen((add) => !add);
   };
@@ -84,16 +87,6 @@ export default function Area() {
   }
   const setEditOpenPopup = () => {
     setEditOpen((add) => !add);
-  };
-
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   const callApi = () => {
@@ -106,12 +99,14 @@ export default function Area() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}area`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}area?page=${page}&size=${size}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
           if (data?.dataItems && data?.dataItems.length > 0) {
             setdataShow(data?.dataItems)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
@@ -136,9 +131,13 @@ export default function Area() {
       navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [page])
+
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
+  }
+
   const handleDelete = (id) => {
-    console.log('delete')
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -155,7 +154,7 @@ export default function Area() {
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
+        toast.error(error?.message)
       });
   }
 
@@ -262,28 +261,28 @@ export default function Area() {
         <Grid sx={{ width: '100%', height: '100vh', textAlign: 'center' }} ><CircularProgress sx={{ color: '#c5c7cf', margin: '0 auto', marginTop: '40%' }} /></Grid> :
         <Container maxWidth="xl">
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Grid container>
+            <Grid container>
               <Grid xs={12} sm={12} md={6} lg={6}>
-            <Typography variant="h4" gutterBottom>
-              Area
-            </Typography>
-            </Grid>
-            <Grid xs={12} sm={12} md={6} lg={6}>
-            <Stack direction="row" justifyContent='flex-end' spacing={1}>
-              <Stack direction="column">
-                {permission_check('area_create') ? <Button onClick={() => setOpen(true)} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
-                  New Area
-                </Button> : ''}
-              </Stack>
-              {permission_check('area_import') ? <Stack direction="column">
-                <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px' }} >
-                  Import Property
-                  <input hidden type="file" onChange={e => uploadPendingFile(e)} />
-                </LoadingButton>
-                <Button variant="text" sx={{ textTransform: 'capitalize' }} onClick={handlePropertySample} >Sample File <DownloadIcon fontSize="small" /></Button>
-              </Stack> : ''}
-            </Stack>
-            </Grid>
+                <Typography variant="h4" gutterBottom>
+                  Area
+                </Typography>
+              </Grid>
+              <Grid xs={12} sm={12} md={6} lg={6}>
+                <Stack direction="row" justifyContent='flex-end' spacing={1}>
+                  <Stack direction="column">
+                    {permission_check('area_create') ? <Button onClick={() => setOpen(true)} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
+                      New Area
+                    </Button> : ''}
+                  </Stack>
+                  {permission_check('area_import') ? <Stack direction="column">
+                    <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px' }} >
+                      Import Property
+                      <input hidden type="file" onChange={e => uploadPendingFile(e)} />
+                    </LoadingButton>
+                    <Button variant="text" sx={{ textTransform: 'capitalize' }} onClick={handlePropertySample} >Sample File <DownloadIcon fontSize="small" /></Button>
+                  </Stack> : ''}
+                </Stack>
+              </Grid>
             </Grid>
           </Stack>
 
@@ -322,15 +321,18 @@ export default function Area() {
               </TableContainer>
             </Scrollbar>
 
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
+
           </Card>
           <Popup title="Add Area" openPopup={open} setOpenPopup={setOpenPopup}>
             <AreaAdd popup={open} popupChange={handleClickClose} accessToken={token} />

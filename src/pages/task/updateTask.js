@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useFormik, Form, FormikProvider } from 'formik';
-import Autocomplete from '@mui/material/Autocomplete';
 import {
     Stack,
     TextField,
@@ -16,8 +15,6 @@ import { permission_check } from 'src/_mock/permission_check';
 export default function TaskAdd(props) {
     const navigate = useNavigate();
     const [btnLoad, setbtnLoad] = useState(false);
-    const currentDate = new Date();
-    const minDate = currentDate.toISOString().split('T')[0]; 
     const LoginSchema = Yup.object().shape({
         comments: Yup.string().required('comments is required'),
         status: Yup.string().required('Status is required')
@@ -50,7 +47,6 @@ export default function TaskAdd(props) {
                 .then((response) => response.json())
                 .then((data) => {
                     setbtnLoad(false)
-                    console.log(data)
                     if ('success' in data) {
                         setbtnLoad(false)
                         window.location.reload()
@@ -67,7 +63,7 @@ export default function TaskAdd(props) {
                 });
         }
     });
-    const { values, errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
+    const { errors, touched, handleSubmit, getFieldProps } = formik;
 
     const closePopup = () => {
         props.popupChange(false);
@@ -76,7 +72,7 @@ export default function TaskAdd(props) {
     return (
         <FormikProvider value={formik}>
             <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
-             
+
                 <Stack mt={2}>
                     <TextField
                         multiline
@@ -91,7 +87,7 @@ export default function TaskAdd(props) {
                         helperText={touched.comments && errors.comments}
                     />
                 </Stack>
-             
+
                 <Stack mt={2}>
                     <FormControl fullWidth>
                         <InputLabel id="available_for">Status</InputLabel>

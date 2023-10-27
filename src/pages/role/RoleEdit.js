@@ -6,7 +6,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import {
     Stack,
     TextField,
-    Button, Box
+    Button
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
@@ -16,8 +16,6 @@ import { permission_check } from 'src/_mock/permission_check';
 export default function RoleEdit(props) {
     const navigate = useNavigate();
     const [btnLoad, setbtnLoad] = useState(false);
-    const [value, setValue] = useState('');
-    const [userData, setUserData] = useState([]);
     const [permissionData, setPermissionData] = useState([]);
     const [selectedPermission, setSelectedPermission] = useState([])
 
@@ -40,11 +38,6 @@ export default function RoleEdit(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const isOptionEqualToValue = (option, value) => {
-        // Customize the comparison based on your criteria.
-        // In this example, we're comparing option.id to value.id.
-        return option?.id === value?.id;
-    };
 
     const RoleSchema = Yup.object().shape({
         name: Yup.string().required('Name is required'),
@@ -60,7 +53,6 @@ export default function RoleEdit(props) {
         validationSchema: RoleSchema,
         onSubmit: (initialValues) => {
             setbtnLoad(true)
-            console.log("asas")
             const requestOptions = {
                 method: "POST",
                 headers: {
@@ -161,10 +153,3 @@ export default function RoleEdit(props) {
         </FormikProvider>
     );
 }
-const top100Films = [
-    { name: 'User Add', id: 1 },
-    { name: 'User Edit', id: 2 },
-    { name: 'User Delete', id: 3 },
-    { name: 'Read', id: 4 },
-    { name: 'All', id: 5 },
-];

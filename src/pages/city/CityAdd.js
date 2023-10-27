@@ -61,9 +61,7 @@ export default function OwnerAdd(props) {
                 .then((response) => response.json())
                 .then((data) => {
                     setbtnLoad(false)
-                    console.log("data : ", data)
                     if ('error' in data) {
-                        console.log("data: ", data.error)
                         if (Object.keys(data.errors).length > 0) {
                             setErrors(data.errors)
                         } else {

@@ -118,7 +118,6 @@ export default function Permission() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const handleDelete = (id) => {
-    console.log(id)
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -129,14 +128,12 @@ export default function Permission() {
     fetch(`${process.env.REACT_APP_SITE_URL}permission/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         toast.success('Delete Successfully')
         const newArray = showData.filter((item) => (
           item._id !== id
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
       });
   }
   return (

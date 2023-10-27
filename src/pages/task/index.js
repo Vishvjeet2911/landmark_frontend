@@ -107,9 +107,11 @@ export default function Task() {
             if (data?.message === 'Please login first') {
               navigate('/logout')
             }
+            toast.error(data?.message)
           }
         }).catch(error => {
           setLoader(false)
+          toast.error(error?.message)
           if (error?.message === 'Please login first') {
             navigate('/logout')
           }
@@ -142,28 +144,7 @@ export default function Task() {
     getAllUsers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const handleDelete = (id) => {
-    console.log('delete')
-    const requestOptions = {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    };
-    fetch(`${process.env.REACT_APP_SITE_URL}role/${id}`, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        toast.success('Delete Successfully')
-        const newArray = showData.filter((item) => (
-          item._id !== id
-        ));
-        setdataShow(newArray);
-      }).catch(error => {
-        console.log(error)
-      });
-  }
+ 
 
   const handleEditClick = (row) => {
     setEditData(row)
