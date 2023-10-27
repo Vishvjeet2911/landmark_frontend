@@ -92,7 +92,7 @@ export default function Property() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
   const [filters, setFilters] = useState({
-    state_id: account?.state?.id ? account?.state?.id : '',
+    state_id: permission_check('admin') ? '' : account?.state?.id,
     city_id: '',
     area_name: '',
     available_for: '',

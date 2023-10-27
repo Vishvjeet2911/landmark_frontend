@@ -8,11 +8,13 @@ import { Grid, Button } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Autocomplete from '@mui/material/Autocomplete';
 import account from 'src/_mock/account';
+import { permission_check } from 'src/_mock/permission_check';
 
 export default function Filter(props) {
     const { setFilters, onFilter, states } = props;
+
     const [values, setValues] = useState({
-        state_id: account?.state?.id ? account?.state?.id : '',
+        state_id: permission_check('admin') ? '' : account?.state?.id,
         city_id: '',
         area_name: '',
         available_for: '',
@@ -60,7 +62,7 @@ export default function Filter(props) {
     }
 
     useEffect(() => {
-        if (account?.state?.id) {
+        if (!permission_check('admin')) {
             handleCity(account?.state?.id)
         }
     }, [account?.state?.id])
@@ -78,8 +80,7 @@ export default function Filter(props) {
     }
     return (
         <Grid container spacing={2}>
-
-            {!account?.state?.id ?
+            {permission_check('admin') ?
                 <Grid item xs={12} md={6} lg={6} >
                     <Autocomplete
                         id="state"
