@@ -262,10 +262,14 @@ export default function Area() {
         <Grid sx={{ width: '100%', height: '100vh', textAlign: 'center' }} ><CircularProgress sx={{ color: '#c5c7cf', margin: '0 auto', marginTop: '40%' }} /></Grid> :
         <Container maxWidth="xl">
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          <Grid container>
+              <Grid xs={12} sm={12} md={6} lg={6}>
             <Typography variant="h4" gutterBottom>
               Area
             </Typography>
-            <Stack direction="row" alignItems="right" spacing={1}>
+            </Grid>
+            <Grid xs={12} sm={12} md={6} lg={6}>
+            <Stack direction="row" justifyContent='flex-end' spacing={1}>
               <Stack direction="column">
                 {permission_check('area_create') ? <Button onClick={() => setOpen(true)} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
                   New Area
@@ -279,6 +283,8 @@ export default function Area() {
                 <Button variant="text" sx={{ textTransform: 'capitalize' }} onClick={handlePropertySample} >Sample File <DownloadIcon fontSize="small" /></Button>
               </Stack> : ''}
             </Stack>
+            </Grid>
+            </Grid>
           </Stack>
 
           <Card>

@@ -434,28 +434,33 @@ export default function Property() {
             </Accordion>
           </Stack>
           <Stack direction="row" justifyContent="space-between" >
-            <Typography variant="h4" gutterBottom>
-              Property
-            </Typography>
-            <Stack direction="row" alignItems="right" spacing={1}>
-              <Stack direction="column">
-                {permission_check('property_create') ? <Button onClick={() => navigate('/property-add')} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
-                  New Property
-                </Button> : ''}
-              </Stack>
-              {permission_check('property_import') ? <Stack direction="column">
-                <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px' }} >
-                  Import Property
-                  <input hidden type="file" onChange={e => uploadPendingFile(e)} />
-                </LoadingButton>
-                <Button variant="text" sx={{ textTransform: 'capitalize' }} onClick={handlePropertySample} >Sample File <DownloadIcon fontSize="small" /></Button>
-              </Stack> : ''}
-              {permission_check('property_export') ? <Stack direction="column">
-                <LoadingButton variant="contained" startIcon={<DownloadIcon />} loading={exportLoad} sx={{ backgroundColor: '#1a237e', marginY: '10px', marginRight: '10px' }} onClick={handleDownloadClick}>Export</LoadingButton>
-              </Stack> : ''}
-            </Stack>
+            <Grid container>
+              <Grid xs={12} sm={12} md={6} lg={6}>
+                <Typography variant="h4" gutterBottom>
+                  Property
+                </Typography>
+              </Grid>
+              <Grid xs={12} sm={12} md={6} lg={6}  alignItems="right" >
+                <Stack direction="row"  spacing={1}>
+                  <Stack direction="column">
+                    {permission_check('property_create') ? <Button onClick={() => navigate('/property-add')} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
+                      New Property
+                    </Button> : ''}
+                  </Stack>
+                  {permission_check('property_import') ? <Stack direction="column">
+                    <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px', textAlign:'justify' }} >
+                      Import Property
+                      <input hidden type="file" onChange={e => uploadPendingFile(e)} />
+                    </LoadingButton>
+                    <Button variant="text" sx={{ textTransform: 'capitalize' }} onClick={handlePropertySample} >Sample File <DownloadIcon fontSize="small" /></Button>
+                  </Stack> : ''}
+                  {permission_check('property_export') ? <Stack direction="column">
+                    <LoadingButton variant="contained" startIcon={<DownloadIcon />} loading={exportLoad} sx={{ backgroundColor: '#1a237e', marginY: '10px', marginRight: '10px' }} onClick={handleDownloadClick}>Export</LoadingButton>
+                  </Stack> : ''}
+                </Stack>
+              </Grid>
+            </Grid>
           </Stack>
-
           <Card>
 
             <Scrollbar>
