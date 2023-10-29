@@ -16,7 +16,8 @@ import { permission_check } from 'src/_mock/permission_check';
 export default function TaskAdd(props) {
     const navigate = useNavigate();
     const [btnLoad, setbtnLoad] = useState(false);
-    const currentDate = new Date();
+    let currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 1);  
     const minDate = currentDate.toISOString().split('T')[0]; 
     const LoginSchema = Yup.object().shape({
         comments: Yup.string().required('comments is required'),
@@ -32,6 +33,7 @@ export default function TaskAdd(props) {
         initialValues: {
             id: props?.record?.id ? props.record.id : '',
             comments: '',
+            followup_date :props?.record?.followup_date ? props?.record?.followup_date : '',
             status: props?.record?.status ? props?.record?.status : '',
         },
         enableReinitialize: true,
@@ -76,7 +78,19 @@ export default function TaskAdd(props) {
     return (
         <FormikProvider value={formik}>
             <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
-             
+            <Stack mt={2}>
+                    <TextField
+                        fullWidth
+                        inputProps={{ min: minDate }}
+                        type="date"
+                        variant="outlined"
+                        label="Followup Date"
+                        {...getFieldProps('followup_date')}
+                        InputLabelProps={{ shrink: true }}
+                        error={Boolean(touched.followup_date && errors.followup_date)}
+                        helperText={touched.followup_date && errors.followup_date}
+                    />
+                </Stack>
                 <Stack mt={2}>
                     <TextField
                         multiline
@@ -103,9 +117,9 @@ export default function TaskAdd(props) {
                             error={Boolean(touched.status && errors.status)}
                             helpertext={touched.status && errors.status}
                         >
-                            <MenuItem value="Pending">Pending</MenuItem>
+                            {/* <MenuItem value="Pending">Pending</MenuItem> */}
                             <MenuItem value="In progress">In Progress</MenuItem>
-                            <MenuItem value="Declined">Declined</MenuItem>
+                            {/* <MenuItem value="Declined">Declined</MenuItem> */}
                             <MenuItem value="Completed">Completed</MenuItem>
                         </Select>
                     </FormControl>
