@@ -203,7 +203,7 @@ export default function User() {
                         <StyledTableCell >{row?.name}</StyledTableCell>
                         <StyledTableCell >{row?.email}</StyledTableCell>
                         <StyledTableCell >{row?.mobile}</StyledTableCell>
-                        <StyledTableCell >{row?.states?.name}</StyledTableCell>
+                        <StyledTableCell >{row?.states ? row?.states?.map((state) => state.name).join(', ') : ''}</StyledTableCell>
                         <StyledTableCell >{row?.roles?.name}</StyledTableCell>
                         <StyledTableCell >{row?.new_permission}</StyledTableCell>
                         <StyledTableCell >{row?.status ? <span style={{ color: '#1A5F35' }}>Active</span> : <span style={{ color: '#DB1411' }}>Inactive</span>}</StyledTableCell>
@@ -237,7 +237,7 @@ export default function User() {
             <UserAdd popup={open} popupChange={handleClickClose} accessToken={token} />
           </Popup>
           <Popup title="Edit User" openPopup={openEdit} setOpenPopup={setEditOpenPopup} >
-            <UserEdit popup={openEdit} popupChange={setEditOpenPopup} record={record} />
+            <UserEdit popup={openEdit} popupChange={setEditOpenPopup} record={record} accessToken={token}/>
           </Popup>
         </Container>
       }

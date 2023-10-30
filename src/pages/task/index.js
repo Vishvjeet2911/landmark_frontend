@@ -23,6 +23,7 @@ import {
   TableHead,
   TableContainer,
   TablePagination,
+  Pagination
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -60,13 +61,15 @@ export default function Task() {
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [allUsers, setUsersData] = useState([])
   const [editData, setEditData] = useState()
-
+  const [page, setPage] = useState(0);
+  const [size] = useState(15);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
   const setOpenPopup = () => {
     setOpen((add) => !add);
   };
@@ -81,7 +84,9 @@ export default function Task() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
+  }
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -101,13 +106,14 @@ export default function Task() {
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          if (data && data?.length > 0) {
-            setdataShow(data)
+          if (data?.dataItems) {
+            setdataShow(data?.dataItems)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
             }
-            toast.error(data?.message)
           }
         }).catch(error => {
           setLoader(false)
@@ -140,10 +146,13 @@ export default function Task() {
   }
 
   useEffect(() => {
+    if (!permission_check('task_view')) {
+      navigate('/')
+    }
     callApi()
     getAllUsers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [page])
  
 
   const handleEditClick = (row) => {
@@ -232,16 +241,17 @@ export default function Task() {
                 </Table>
               </TableContainer>
             </Scrollbar>
-
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
           </Card>
           <Popup title="Add Task" openPopup={open} setOpenPopup={setOpenPopup}>
             <TaskAdd popup={open} popupChange={handleClickClose} accessToken={token} allUsers={allUsers} />

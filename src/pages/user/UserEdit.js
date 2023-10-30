@@ -2,10 +2,12 @@ import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useFormik, Form, FormikProvider } from 'formik';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
     Stack,
     TextField,
-    Button
+    Button,
+
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +23,7 @@ export default function RoleAdd(props) {
     const [btnLoad, setbtnLoad] = useState(false);
     const [roleData, setRoleData] = useState([])
     const [stateData, setStateData] = useState([])
-
+    const [selectedState, setSelectedState] = useState([])
     useEffect(() => {
         if (!permission_check('user_edit')) {
             navigate('/')
@@ -37,6 +39,7 @@ export default function RoleAdd(props) {
             .then((response) => response.json())
             .then((data) => {
                 setRoleData(data?.data?.roles)
+                console.log(data?.data?.states)
                 setStateData(data?.data?.states)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,7 +48,7 @@ export default function RoleAdd(props) {
     const LoginSchema = Yup.object().shape({
         name: Yup.string().required('Name is required'),
         email: Yup.string().required('Email is required'),
-        state_id: Yup.string().required('State is required'),
+        state_id: Yup.array().of(Yup.string()).required('State is required'),
         password: Yup.string().required('Password is required'),
         mobile: Yup.string().required('Mobile is required'),
         status: Yup.string().required('Status is required'),
@@ -58,7 +61,7 @@ export default function RoleAdd(props) {
             password: props?.record?.password ? props.record.password : '',
             mobile: props?.record?.mobile ? props.record.mobile : '',
             role: props?.record?.role ? props.record.role : '',
-            state_id: props?.record?.state_id ? props.record.state_id : '',
+            state_id: props?.record?.states ? props.record.states :[],
             status: props?.record?.status ? (props.record.status === true ? '1' : '0') : '0',
         },
         enableReinitialize: true,
@@ -189,8 +192,34 @@ export default function RoleAdd(props) {
                             )}
                         </Select>
                     </FormControl>
+                  
                 </Stack>
-              
+                <Stack mt={2}>
+                    <Autocomplete
+                        multiple
+                        id="tags-standard2"
+                        options={stateData}
+                        getOptionLabel={(option) => option.name}
+                        defaultValue={values.state_id}
+                        onChange={(event, newValue) => {
+                            setSelectedState(newValue)
+                            const resp = newValue.map(item => item?.id)
+                            setFieldValue("state_id", resp);
+                        }}
+                        // isOptionEqualToValue={isOptionEqualToValue}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="outlined"
+                                label="Select States"
+                                placeholder="states"
+                                error={Boolean(touched.state_id && errors.state_id)}
+                                helperText={touched.state_id && errors.state_id}
+
+                            />
+                        )}
+                    />
+                </Stack>
                 <Stack mt={2}>
                     <FormControl fullWidth size="small">
                         <InputLabel id="demo-simple-select-label">Select Status</InputLabel>

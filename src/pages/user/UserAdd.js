@@ -47,14 +47,14 @@ export default function RoleAdd(props) {
         email: Yup.string().required('Email is required'),
         password: Yup.string().required('Password is required'),
         mobile: Yup.string().required('Mobile is required'),
-        state_id: Yup.string().required('State is required'),
+        // state_id: Yup.string().required('State is required'),
         status: Yup.string().required('Status is required'),
     });
     const formik = useFormik({
         initialValues: {
             name: '',
             email: '',
-            state_id: '',
+            state_id: [],
             password: '',
             mobile: '',
             role: '',
@@ -63,7 +63,7 @@ export default function RoleAdd(props) {
         enableReinitialize: true,
         validationSchema: LoginSchema,
         onSubmit: (initialValues, {setErrors}) => {
-            setbtnLoad(true)
+            // setbtnLoad(true)
             const requestOptions = {
                 method: "POST",
                 headers: {
@@ -72,6 +72,7 @@ export default function RoleAdd(props) {
                 },
                 body: JSON.stringify(initialValues),
             };
+            console.log(initialValues.state_id)
             fetch(`${process.env.REACT_APP_SITE_URL}user`, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {
@@ -181,13 +182,14 @@ export default function RoleAdd(props) {
                 </Stack>
                 <Stack mt={2}>
                     <Autocomplete
-                        // multiple
-                        id="tags-standard"
+                        multiple
+                        id="tags-standard2"
                         options={stateData}
                         getOptionLabel={(option) => option?.name || ''}
                         onChange={(event, newValue) => {
                             setSelectedState(newValue)
-                            setFieldValue("state_id", newValue?.id);
+                            const resp = newValue.map(item => item?.id)
+                            setFieldValue("state_id", resp);
                         }}
                         renderInput={(params) => (
                             <TextField

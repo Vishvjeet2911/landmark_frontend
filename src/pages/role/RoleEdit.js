@@ -18,7 +18,6 @@ export default function RoleEdit(props) {
     const [btnLoad, setbtnLoad] = useState(false);
     const [permissionData, setPermissionData] = useState([]);
     const [selectedPermission, setSelectedPermission] = useState([])
-
     useEffect(() => {
         if (!permission_check('role_edit')) {
             navigate('/')
