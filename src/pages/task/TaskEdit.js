@@ -47,7 +47,6 @@ export default function TaskAdd(props) {
         enableReinitialize: true,
         validationSchema: LoginSchema,
         onSubmit: (initialValues) => {
-            console.log(initialValues)
             setbtnLoad(true)
             const requestOptions = {
                 method: "POST",

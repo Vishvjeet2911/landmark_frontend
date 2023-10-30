@@ -48,7 +48,6 @@ export default function PropertyAdd() {
         fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                console.log("data : ", data)
                 setStateData(data?.data?.states)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +73,6 @@ export default function PropertyAdd() {
         }
     }, []);
     const onDeleteImage = (index) => {
-        console.log(uploadedImages)
         setUploadedImages((prevImages) => {
             const updatedImages = [...prevImages];
             updatedImages.splice(index, 1); // Remove one element at the specified index
@@ -180,7 +178,6 @@ export default function PropertyAdd() {
     }
     const handleArea = (id) => {
         const areas = cityData.find(item => item.id === id);
-        console.log("areas :", areas)
         setSelectedArea({})
         setAreaData(areas ? areas.areas : []);
     }
@@ -195,10 +192,8 @@ export default function PropertyAdd() {
             reader.onload = (e) => {
                 setSelectedFile(e.target.result);
             };
-            console.log(" file : ", file)
             reader.readAsDataURL(file);
         }
-        console.log("values : ", values)
         const objectUrl = URL.createObjectURL(e.target.files[0])
         setPreview(objectUrl)
     }
@@ -218,7 +213,6 @@ export default function PropertyAdd() {
                                 getOptionLabel={(option) => option?.name || ''}
                                 onChange={(event, newValue) => {
                                     setSelectedState(newValue ? newValue : {})
-                                    console.log("state_id", newValue?.id, " -- ", newValue?.name)
                                     setFieldValue("state_id", newValue?.id);
                                     handleCity(newValue ? newValue.id : 0)
                                 }}
@@ -243,7 +237,6 @@ export default function PropertyAdd() {
                                 onChange={(event, newValue) => {
                                     setSelectedCity(newValue ? newValue : {})
                                     setFieldValue("city_id", newValue?.id);
-                                    console.log("city_id", newValue?.id, " -- ", newValue?.name)
                                     handleArea(newValue ? newValue.id : 0)
                                 }}
                                 renderInput={(params) => (
@@ -266,7 +259,6 @@ export default function PropertyAdd() {
                                 getOptionLabel={(option) => option?.name || ''}
                                 onChange={(event, newValue) => {
                                     setSelectedArea(newValue ? newValue : {})
-                                    console.log("area_id", newValue?.id, " -- ", newValue?.name)
                                     setFieldValue("area_id", newValue?.id);
                                 }}
                                 renderInput={(params) => (
@@ -429,6 +421,7 @@ export default function PropertyAdd() {
                         <Grid item xs={12} md={6} lg={6} >
                             <TextField
                                 fullWidth
+                                multiline
                                 type="text"
                                 variant="outlined"
                                 label="Area Avaliable"
@@ -441,6 +434,7 @@ export default function PropertyAdd() {
                             <TextField
                                 fullWidth
                                 type="text"
+                                multiline
                                 variant="outlined"
                                 label="Premises Condition"
                                 {...getFieldProps('premises_condition')}
@@ -452,6 +446,7 @@ export default function PropertyAdd() {
                             <TextField
                                 fullWidth
                                 type="text"
+                                multiline
                                 variant="outlined"
                                 label="Per sq.ft Rate"
                                 {...getFieldProps('per_sq_rate')}
@@ -463,6 +458,7 @@ export default function PropertyAdd() {
                             <TextField
                                 fullWidth
                                 type="text"
+                                multiline
                                 variant="outlined"
                                 label="Maintainance Charges"
                                 {...getFieldProps('maintenance_charge')}
@@ -483,8 +479,8 @@ export default function PropertyAdd() {
                                         <input hidden accept="image/*" type="file" onChange={(e) => onSelectFile(e)} />
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={12} md={12} lg={12} mt={1}>
-                                    {(selectedFile) && <img src={preview} style={{ width: '100%' }} alt="" />}
+                                <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                    {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />}
                                 </Grid>
                             </Grid>
                         </Grid>

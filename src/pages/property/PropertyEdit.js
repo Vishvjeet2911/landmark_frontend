@@ -14,6 +14,7 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Dropzone, { useDropzone } from 'react-dropzone'
 import DeleteIcon from '@mui/icons-material/Delete';
+
 // ----------------------------------------------------------------------
 
 export default function LocationAdd() {
@@ -21,13 +22,11 @@ export default function LocationAdd() {
     const accessToken = localStorage.getItem('lm_token')
     const location = useLocation();
     const [btnLoad, setbtnLoad] = useState(false);
-    const [selectedOwner, setSelectedOwner] = useState({})
     const [stateData, setStateData] = useState([])
     const [cityData, setCityData] = useState([])
     const [areaData, setAreaData] = useState([])
     const [selectedFile, setSelectedFile] = useState(null)
     const [preview, setPreview] = useState('')
-    // const [age, setAge] = useState('');
     const [selectedState, setSelectedState] = useState({})
     const [selectedCity, setSelectedCity] = useState({})
     const [selectedArea, setSelectedArea] = useState({})
@@ -60,7 +59,6 @@ export default function LocationAdd() {
 
                 setSelectedArea(citites?.areas?.find(item => item.id === currentData?.area_id))
                 setAreaData(citites?.areas) 
-                console.log("upoaded iamge ",currentData.images)         
           });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -84,7 +82,6 @@ export default function LocationAdd() {
         }
     }, []);
     const onDeleteImage = (index) => {
-        console.log(uploadedImages)
         setUploadedImages((prevImages) => {
             const updatedImages = [...prevImages];
             updatedImages.splice(index, 1); // Remove one element at the specified index
@@ -146,7 +143,6 @@ export default function LocationAdd() {
             setbtnLoad(true)
             initialValues.image = selectedFile ? selectedFile : initialValues.image
             initialValues.images = uploadedImages ? uploadedImages :[]
-            console.log("initialValues : ", initialValues.image) 
             const requestOptions = {
                 method: "POST",
                 headers: {
@@ -188,7 +184,6 @@ export default function LocationAdd() {
 
     const handleArea = (id) => {
         const areas = cityData.find(item => item.id === id);
-        console.log("areas :", areas)
         setSelectedArea({})
         setAreaData(areas ? areas.areas : []);
     }
@@ -205,7 +200,6 @@ export default function LocationAdd() {
             };
             reader.readAsDataURL(file);
           }
-          console.log("values : ",values)
         const objectUrl = URL.createObjectURL(e.target.files[0])
         setPreview(objectUrl)
     }
@@ -481,7 +475,7 @@ export default function LocationAdd() {
                                     </Button>
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={12} lg={12} mt={1}>
-                                    {(selectedFile || values.image ) && <img src={preview || values.image} style={{ width: '100%' }} alt="" />}
+                                    {(selectedFile || values.image ) && <img src={preview || values.image} style={{ width: '100px', height: '150px',  }} alt="" />}
                                 </Grid>
                             </Grid>
                         </Grid>

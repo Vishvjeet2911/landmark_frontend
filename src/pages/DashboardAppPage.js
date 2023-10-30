@@ -23,12 +23,14 @@ import {
   TableHead,
   TableContainer,
   TablePagination,
+  Pagination
 } from '@mui/material';
 // components
 import Popup from '../components/Popup'
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import TaskEdit from './task/updateTask';
+import TaskView from './task/viewTask';
 import { permission_check } from 'src/_mock/permission_check';
 
 
@@ -59,13 +61,17 @@ export default function Task() {
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
+  const [openView, setViewOpen] = useState(false);
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [allUsers, setUsersData] = useState([])
   const [editData, setEditData] = useState()
-
+  const [viewData, setViewData] = useState()
+  const [page, setPage] = useState(0);
+  const [size] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
   const setOpenPopup = () => {
     setOpen((add) => !add);
   };
@@ -75,7 +81,9 @@ export default function Task() {
   const setEditOpenPopup = () => {
     setEditOpen((add) => !add);
   };
-
+  const setViewOpenPopup = () => {
+    setViewOpen((add) => !add);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -96,12 +104,14 @@ export default function Task() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}task/list`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}task/list?page=${page}&size=${size}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          if (data && data?.length > 0) {
-            setdataShow(data)
+          if (data?.dataItems && data?.dataItems.length > 0) {
+            setdataShow(data?.dataItems)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
@@ -109,6 +119,7 @@ export default function Task() {
           }
         }).catch(error => {
           setLoader(false)
+          toast.error(error?.message)
           if (error?.message === 'Please login first') {
             navigate('/logout')
           }
@@ -168,7 +179,13 @@ export default function Task() {
     setEditData(row)
     setEditOpen(true)
   }
-
+  const handleViewClick = (row) => {
+    setViewData(row)
+    setViewOpen(true)
+  }
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
+  }
   const colorCoding = (status) => {
     switch (status) {
       case 'Pending':
@@ -202,11 +219,8 @@ export default function Task() {
         <Container maxWidth="xl">
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
             <Typography variant="h4" gutterBottom>
-              Task
+              Your Task
             </Typography>
-            {permission_check('task_create') ? <Button onClick={() => setOpen(true)} variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-              New Task
-            </Button> : ''}
           </Stack>
 
           <Card>
@@ -217,10 +231,11 @@ export default function Task() {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <StyledTableCell>Task Date</StyledTableCell>
                       <StyledTableCell>Task Name</StyledTableCell>
                       <StyledTableCell >Task Description</StyledTableCell>
-                      <StyledTableCell >Assigned by</StyledTableCell>
-                      <StyledTableCell >Assigned to</StyledTableCell>
+                      <StyledTableCell >Assigned By</StyledTableCell>
+                      <StyledTableCell >FollowUp Date</StyledTableCell>
                       <StyledTableCell >Comments</StyledTableCell>
                       <StyledTableCell >Status</StyledTableCell>
                       <StyledTableCell >Action</StyledTableCell>
@@ -229,19 +244,20 @@ export default function Task() {
                   <TableBody>
                     {showData.map((row) => (
                       <StyledTableRow key={row?.id}>
+                        <StyledTableCell>{row?.task_date}</StyledTableCell>
                         <StyledTableCell>{row?.task_name}</StyledTableCell>
                         <StyledTableCell >{row?.task_description}</StyledTableCell>
-                        <StyledTableCell >{row?.assignedByUser?.email}</StyledTableCell>
-                        <StyledTableCell >{row?.assignedToUser?.email}</StyledTableCell>
+                        <StyledTableCell >{row?.assignedByUser?.name}</StyledTableCell>
+                        <StyledTableCell >{row?.followup_date}</StyledTableCell>
                         <StyledTableCell > {row?.comments?.split('||').map((element, index) => (
-                           <Typography key={index} variant="body2" sx={{marginLeft:'10px', flexWrap: 'wrap', wordWrap: 'break-word' }} >  {element}</Typography>))}</StyledTableCell>
+                          <Typography key={index} variant="body2" sx={{ marginLeft: '10px', flexWrap: 'wrap', wordWrap: 'break-word' }} >  {element}</Typography>))}</StyledTableCell>
                         <StyledTableCell sx={{ color: colorCoding(row?.status) }}>{row?.status}</StyledTableCell>
                         <StyledTableCell >
-                          {permission_check('task_edit') ? <IconButton onClick={() => handleEditClick(row)}>
+                          {permission_check('task_update') ? <IconButton onClick={() => handleEditClick(row)}>
                             <Iconify sx={{ color: 'blue' }} icon={'eva:edit-fill'} />
                           </IconButton> : ''}
-                          {/* <IconButton onClick={() => handleDelete(row?.id)}>
-                            <Iconify sx={{ color: '#db0011' }} icon={'eva:trash-2-outline'} />
+                          {/* <IconButton onClick={() => handleViewClick(row)}>
+                            <Iconify sx={{ color: '#e418d6' }} icon={'eva:eye-fill'} />
                           </IconButton> */}
                         </StyledTableCell>
                       </StyledTableRow>
@@ -251,19 +267,25 @@ export default function Task() {
               </TableContainer>
             </Scrollbar>
 
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
           </Card>
           <Popup title="Edit Task" openPopup={openEdit} setOpenPopup={setEditOpenPopup}>
-          <TaskEdit popup={openEdit} popupChange={setEditOpenPopup} accessToken={token} allUsers={allUsers} record={editData} />
-        </Popup>
+            <TaskEdit popup={openEdit} popupChange={setEditOpenPopup} accessToken={token} allUsers={allUsers} record={editData} />
+          </Popup>
+          <Popup title="View Task" openPopup={openView} setOpenPopup={setViewOpenPopup}>
+            <TaskView popup={openView} popupChange={setViewOpenPopup} record={viewData} />
+          </Popup>
         </Container> : ''}
     </>
   );

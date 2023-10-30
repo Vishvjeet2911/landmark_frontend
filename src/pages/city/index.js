@@ -20,7 +20,7 @@ import {
   IconButton,
   TableHead,
   TableContainer,
-  TablePagination,
+  Pagination,
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -58,11 +58,14 @@ export default function Area() {
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
   const [record, setRecord] = useState()
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
+  const [size] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   const setOpenPopup = () => {
     setOpen((add) => !add);
   };
@@ -71,16 +74,6 @@ export default function Area() {
   }
   const setEditOpenPopup = () => {
     setEditOpen((add) => !add);
-  };
-
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
   const callApi = () => {
@@ -93,29 +86,30 @@ export default function Area() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}city`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}city?page=${page}&size=${size}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
           if (data?.dataItems && data?.dataItems.length > 0) {
             setdataShow(data?.dataItems)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
             }
+            toast.error(data?.message)
           }
         }).catch(error => {
           setLoader(false)
           if (error?.message === 'Please login first') {
             navigate('/logout')
           }
-          console.log(error)
+          toast.error(error?.message)
         });
     } else {
       setLoader(false)
       navigate('/logout')
-
-      console.log('here')
     }
   }
 
@@ -125,29 +119,12 @@ export default function Area() {
       navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  const handleDelete = (id) => {
-    console.log('delete')
-    const requestOptions = {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    };
-    fetch(`${process.env.REACT_APP_SITE_URL}city/${id}`, requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        toast.success('Delete Successfully')
-        const newArray = showData.filter((item) => (
-          item._id !== id
-        ));
-        setdataShow(newArray);
-      }).catch(error => {
-        console.log(error)
-      });
-  }
+  }, [page])
 
+
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
+  }
   const handleEditClick = (row) => {
     setRecord(row)
     setEditOpen(true)
@@ -186,7 +163,7 @@ export default function Area() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell>ID</StyledTableCell>
+                      {/* <StyledTableCell>ID</StyledTableCell> */}
                       <StyledTableCell >City Name</StyledTableCell>
                       <StyledTableCell >State Name</StyledTableCell>
                       <StyledTableCell >Action</StyledTableCell>
@@ -195,7 +172,7 @@ export default function Area() {
                   <TableBody>
                     {showData.map((row) => (
                       <StyledTableRow key={row?.id}>
-                        <StyledTableCell >{row?.id}</StyledTableCell>
+                        {/* <StyledTableCell >{row?.id}</StyledTableCell> */}
                         <StyledTableCell >{row?.name}</StyledTableCell>
                         <StyledTableCell >{row?.states?.name}</StyledTableCell>
                         <StyledTableCell >
@@ -210,15 +187,17 @@ export default function Area() {
               </TableContainer>
             </Scrollbar>
 
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
           </Card>
           <Popup title="Add Area" openPopup={open} setOpenPopup={setOpenPopup}>
             <AreaAdd popup={open} popupChange={handleClickClose} accessToken={token} />

@@ -38,7 +38,7 @@ import {
   IconButton,
   TableHead,
   TableContainer,
-  TablePagination,
+  Pagination,
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -73,25 +73,26 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 export default function Property() {
   const navigate = useNavigate();
-  console.log(account)
   const dialogBox = useRef()
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
   const [openView, setViewOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [showData, setdataShow] = useState([])
   const [stateData, setStateData] = useState([])
   const [areaData, setAreaData] = useState([])
   const [loader, setLoader] = useState(true)
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentData, setCurrentData] = useState({});
   const [exportLoad, setExportLoad] = useState(false);
   const [importLoad, setImportLoad] = useState(false);
   const [openConfirmPending, setOpenConfirmPending] = useState(false);
   const [fileImport, setFileImport] = useState(null);
+  const [page, setPage] = useState(0);
+  const [size] = useState(15);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [filters, setFilters] = useState({
-    state_id: account?.state?.id ? account?.state?.id : '',
+    state_id: permission_check('admin') ? '' : account?.state?.id,
     city_id: '',
     area_name: '',
     available_for: '',
@@ -111,16 +112,6 @@ export default function Property() {
   };
 
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-
   const callApi = () => {
     if (token) {
       setLoader(true)
@@ -131,12 +122,14 @@ export default function Property() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}property?state_id=${filters?.state_id}&city_id=${filters?.city_id}&area_name=${filters?.area_name}&available_for=${filters?.available_for}&nature_of_premises=${filters?.nature_of_premises}&minimum_area=${filters?.minimum_area}&maximum_area=${filters?.maximum_area}`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}property?page=${page}&size=${size}&state_id=${filters?.state_id}&city_id=${filters?.city_id}&area_name=${filters?.area_name}&available_for=${filters?.available_for}&nature_of_premises=${filters?.nature_of_premises}&minimum_area=${filters?.minimum_area}&maximum_area=${filters?.maximum_area}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
           if (data?.dataItems) {
             setdataShow(data?.dataItems)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
@@ -159,9 +152,10 @@ export default function Property() {
     callApi();
     setOnFilters(false);
   }
-  const refreshTable = () => {
-    callApi();
-  };
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
+  }
+
   const otherData = async () => {
     const requestOptions = {
       method: "GET",
@@ -173,16 +167,20 @@ export default function Property() {
     fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("hello", data?.data)
         setStateData(data?.data?.states)
         setAreaData(data?.data?.areas)
       });
   }
   useEffect(() => {
-    callApi()
     otherData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    callApi()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page])
+
   const handleDelete = (id) => {
     const requestOptions = {
       method: 'DELETE',
@@ -200,7 +198,7 @@ export default function Property() {
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
+        toast.error(error?.message)
       });
   }
 
@@ -440,15 +438,15 @@ export default function Property() {
                   Property
                 </Typography>
               </Grid>
-              <Grid xs={12} sm={12} md={6} lg={6}  alignItems="right" >
-                <Stack direction="row"  spacing={1}>
+              <Grid xs={12} sm={12} md={6} lg={6} alignItems="right" >
+                <Stack direction="row" spacing={1}>
                   <Stack direction="column">
                     {permission_check('property_create') ? <Button onClick={() => navigate('/property-add')} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>
                       New Property
                     </Button> : ''}
                   </Stack>
                   {permission_check('property_import') ? <Stack direction="column">
-                    <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px', textAlign:'justify' }} >
+                    <LoadingButton variant="contained" component="label" startIcon={<UploadIcon />} loading={importLoad} sx={{ backgroundColor: '#ff6f00', marginY: '10px', textAlign: 'justify' }} >
                       Import Property
                       <input hidden type="file" onChange={e => uploadPendingFile(e)} />
                     </LoadingButton>
@@ -505,15 +503,17 @@ export default function Property() {
               </TableContainer>
             </Scrollbar>
 
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
 
           </Card>
           <Popup title="Add Property" openPopup={open} setOpenPopup={setOpenPopup}>

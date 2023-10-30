@@ -4,10 +4,6 @@ import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import account from 'src/_mock/account';
-
-// import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
-// @mui
 import {
   Grid,
   Card,
@@ -23,7 +19,7 @@ import {
   IconButton,
   TableHead,
   TableContainer,
-  TablePagination,
+  Pagination
 } from '@mui/material';
 // components
 import Popup from '../../components/Popup'
@@ -58,17 +54,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 
 export default function User() {
-  console.log(account)
   const navigate = useNavigate()
   const token = localStorage.getItem('lm_token')
   const [open, setOpen] = useState(false);
   const [openEdit, setEditOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [record, setRecord] = useState();
   const [showData, setdataShow] = useState([])
   const [loader, setLoader] = useState(true)
-
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
+  const [size] = useState(15);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const setOpenPopup = () => {
     setOpen((add) => !add);
@@ -78,16 +74,6 @@ export default function User() {
   }
   const setEditOpenPopup = () => {
     setEditOpen((add) => !add);
-  };
-
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
   };
 
 
@@ -101,17 +87,18 @@ export default function User() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}user`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}user?page=${page}&size=${size}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
-          console.log(data)
           if (data?.dataItems && data?.dataItems.length > 0) {
             const rolesWithPermissions = data?.dataItems.map(role => {
               const permissionNames = role.permissions.map(permission => permission.name);
               return { ...role, new_permission: permissionNames.join(', ') };
             });
             setdataShow(rolesWithPermissions)
+            setTotalItems(data?.totalItems % size ? (Math.floor(data?.totalItems / size) + 1) : Math.floor(data?.totalItems / size));
+            setTotalRecords(data?.totalItems);
           } else {
             if (data?.message === 'Please login first') {
               navigate('/logout')
@@ -122,13 +109,14 @@ export default function User() {
           if (error?.message === 'Please login first') {
             navigate('/logout')
           }
-          console.log(error)
         });
     } else {
       setLoader(false)
       navigate('/logout')
-      console.log('here')
     }
+  }
+  const handlePagination = (e, p) => {
+    setPage(p - 1);
   }
 
   useEffect(() => {
@@ -137,9 +125,8 @@ export default function User() {
       navigate('/')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [page])
   const handleDelete = (id) => {
-    console.log('delete')
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -150,19 +137,17 @@ export default function User() {
     fetch(`${process.env.REACT_APP_SITE_URL}user/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         toast.success('Delete Successfully')
         const newArray = showData.filter((item) => (
           item._id !== id
         ));
         setdataShow(newArray);
       }).catch(error => {
-        console.log(error)
+        toast.error(error?.message)
       });
   }
 
   const handleEditClick = (row) => {
-    console.log("row : ", row)
     setRecord(row)
     setEditOpen(true)
   }
@@ -200,7 +185,7 @@ export default function User() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell>ID</StyledTableCell>
+                      {/* <StyledTableCell>ID</StyledTableCell> */}
                       <StyledTableCell >Name</StyledTableCell>
                       <StyledTableCell >Email</StyledTableCell>
                       <StyledTableCell >Mobile</StyledTableCell>
@@ -214,7 +199,7 @@ export default function User() {
                   <TableBody>
                     {showData.map((row) => (
                       <StyledTableRow key={row?.id}>
-                        <StyledTableCell>{row?.id}</StyledTableCell>
+                        {/* <StyledTableCell>{row?.id}</StyledTableCell> */}
                         <StyledTableCell >{row?.name}</StyledTableCell>
                         <StyledTableCell >{row?.email}</StyledTableCell>
                         <StyledTableCell >{row?.mobile}</StyledTableCell>
@@ -236,16 +221,17 @@ export default function User() {
                 </Table>
               </TableContainer>
             </Scrollbar>
-
-            {(showData && showData.length > 0) ? <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={showData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            /> : <Typography p={2}>No Data Found</Typography>}
+            <Grid container >
+              <Grid item xs={12} sm={12} md={4} lg={4}></Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {(showData && showData.length > 0) ?
+                  <Pagination count={totalItems} page={page + 1} variant="outlined" sx={{ paddingY: '20px' }} onChange={(e, page) => handlePagination(e, page)} />
+                  : <Typography p={2}>No Data Found</Typography>}
+              </Grid>
+              <Grid item xs={12} sm={12} md={4} lg={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography sx={{ paddingTop: '20px', paddingRight: '10px', fontWeight: '600' }}>Total Items: {totalRecords}</Typography>
+              </Grid>
+            </Grid>
           </Card>
           <Popup title="Add User" openPopup={open} setOpenPopup={setOpenPopup}>
             <UserAdd popup={open} popupChange={handleClickClose} accessToken={token} />

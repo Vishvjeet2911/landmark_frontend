@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Button, Grid, Typography } from '@mui/material';
 
 export default function LocationAdd({ currentData, popupChange }) {
@@ -14,7 +14,7 @@ export default function LocationAdd({ currentData, popupChange }) {
     }, []);
     return (
         <Grid container spacing={3}>
-     
+
             <Grid item xs={12}>
                 <Typography variant="body1" color="blue" >Location Details</Typography>
             </Grid>
@@ -127,11 +127,11 @@ export default function LocationAdd({ currentData, popupChange }) {
             <Grid item xs={12} >
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={6} lg={6}>
-                        {currentData?.image ? <img src={currentData?.image} alt="image" style={{ width: '100%' }} /> : 'No image'}
+                        {currentData?.image ? <img src={currentData?.image} alt="property" style={{ width: '100%' }} /> : 'No image'}
                     </Grid>
                     {uploadedImages.map((imageData, index) => (
                         <Grid item xs={12} sm={6} md={6} lg={6} >
-                            <img style={{ width: '100%' }} alt={`Image ${index}`} src={imageData} />
+                            <img style={{ width: '100%' }} alt={`prop ${index}`} src={imageData} />
                         </Grid>
                     ))}
                 </Grid>

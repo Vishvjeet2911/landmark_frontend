@@ -45,7 +45,7 @@ export default function LoginPage() {
         <Container maxWidth="sm">
           <StyledContent>
             <Typography variant="h4" gutterBottom>
-              Sign in to dashboard
+              Sign in to Tashirealtors
             </Typography>
 
             <LoginForm />

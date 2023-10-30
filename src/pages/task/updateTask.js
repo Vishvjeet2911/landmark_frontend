@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useFormik, Form, FormikProvider } from 'formik';
-import Autocomplete from '@mui/material/Autocomplete';
 import {
     Stack,
     TextField,
@@ -52,7 +51,6 @@ export default function TaskAdd(props) {
                 .then((response) => response.json())
                 .then((data) => {
                     setbtnLoad(false)
-                    console.log(data)
                     if ('success' in data) {
                         setbtnLoad(false)
                         window.location.reload()
@@ -69,7 +67,7 @@ export default function TaskAdd(props) {
                 });
         }
     });
-    const { values, errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
+    const { errors, touched, handleSubmit, getFieldProps } = formik;
 
     const closePopup = () => {
         props.popupChange(false);
@@ -105,7 +103,7 @@ export default function TaskAdd(props) {
                         helperText={touched.comments && errors.comments}
                     />
                 </Stack>
-             
+
                 <Stack mt={2}>
                     <FormControl fullWidth>
                         <InputLabel id="available_for">Status</InputLabel>

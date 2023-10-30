@@ -20,7 +20,6 @@ export default function AreaEdit(props) {
     const [stateData, setStateData] = useState([]);
     const [city, setCity] = useState({});
     const [state, setState] = useState({});
-    console.log(props.record)
     useEffect(() => {
         if (!permission_check('area_edit')) {
             navigate('/')

@@ -78,7 +78,6 @@ export default function RoleAdd(props) {
                 .then((data) => {
                     setbtnLoad(false)
                     if ('error' in data) {
-                        console.log("data: ", data.error)
                         if(Object.keys(data.errors).length > 0){
                             setErrors(data.errors)
                         } else {
