@@ -140,7 +140,7 @@ export default function PropertyAdd() {
         validationSchema: LoginSchema,
         onSubmit: (initialValues) => {
             setbtnLoad(true)
-            initialValues.image = croppedImageUrl ? croppedImageUrl : ''
+            initialValues.image = croppedImageUrl ? croppedImageUrl : src
             initialValues.images = uploadedImages ? uploadedImages : []
             const requestOptions = {
                 method: "POST",

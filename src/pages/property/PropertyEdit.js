@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useFormik, Form, FormikProvider } from 'formik';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -14,7 +14,8 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Dropzone, { useDropzone } from 'react-dropzone'
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 // ----------------------------------------------------------------------
 
 export default function LocationAdd() {
@@ -32,14 +33,25 @@ export default function LocationAdd() {
     const [selectedArea, setSelectedArea] = useState({})
     const [currentData] = useState(location?.state ? location.state : '');
     const [uploadedImages, setUploadedImages] = useState([]);
+    const [src, setSrc] = useState(null);
+    const [crop, setCrop] = useState({
+        unit: "%",
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50
+    });
+    const [croppedImageUrl, setCroppedImageUrl] = useState(null);
+    const imageRef = useRef(null);
 
-  
     useEffect(() => {
-            let images =[]
-            currentData?.images?.filter(element => {
-                images.push(element.image)
-            });
-            setUploadedImages(images)
+        let images = []
+        currentData?.images?.filter(element => {
+            images.push(element.image)
+        });
+        setSrc(currentData?.image)
+
+        setUploadedImages(images)
         const requestOptions = {
             method: "GET",
             headers: {
@@ -58,8 +70,8 @@ export default function LocationAdd() {
                 setCityData(states?.cities)
 
                 setSelectedArea(citites?.areas?.find(item => item.id === currentData?.area_id))
-                setAreaData(citites?.areas) 
-          });
+                setAreaData(citites?.areas)
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const onDrop = useCallback(async (acceptedFiles) => {
@@ -88,7 +100,7 @@ export default function LocationAdd() {
             return updatedImages;
         });
     };
-  
+
     const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
     const LoginSchema = Yup.object().shape({
@@ -141,8 +153,9 @@ export default function LocationAdd() {
         validationSchema: LoginSchema,
         onSubmit: (initialValues) => {
             setbtnLoad(true)
-            initialValues.image = selectedFile ? selectedFile : initialValues.image
-            initialValues.images = uploadedImages ? uploadedImages :[]
+            // initialValues.image = selectedFile ? selectedFile : initialValues.image
+            initialValues.image = croppedImageUrl ? croppedImageUrl : src
+            initialValues.images = uploadedImages ? uploadedImages : []
             const requestOptions = {
                 method: "POST",
                 headers: {
@@ -199,10 +212,75 @@ export default function LocationAdd() {
                 setSelectedFile(e.target.result);
             };
             reader.readAsDataURL(file);
-          }
+        }
         const objectUrl = URL.createObjectURL(e.target.files[0])
         setPreview(objectUrl)
     }
+
+    const onSelectFile1 = e => {
+        if (e.target.files && e.target.files.length > 0) {
+            const reader = new FileReader();
+            reader.addEventListener("load", () => setSrc(reader.result));
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+
+    const onImageLoaded = useCallback(image => {
+        imageRef.current = image;
+        return false; // Return false when setting ref via callback
+    }, []);
+
+    const onCropComplete = useCallback(crop => {
+        makeClientCrop(crop);
+    }, []);
+
+    const onCropChange = (crop, percentCrop) => {
+        setCrop(crop);
+    };
+
+    const makeClientCrop = async (crop) => {
+        if (imageRef.current && crop.width && crop.height) {
+            const newCroppedImageUrl = await getCroppedImg(
+                imageRef.current,
+                crop,
+                "newFile.jpeg"
+            );
+            setCroppedImageUrl(newCroppedImageUrl);
+        }
+    };
+
+    const getCroppedImg = (image, crop, fileName) => {
+        const canvas = document.createElement("canvas");
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+        canvas.width = crop.width;
+        canvas.height = crop.height;
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(
+            image,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            crop.width,
+            crop.height
+        );
+
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+                if (!blob) {
+                    console.error("Canvas is empty");
+                    return;
+                }
+                blob.name = fileName;
+                const fileUrl = window.URL.createObjectURL(blob);
+                resolve(fileUrl);
+            }, "image/jpeg");
+        });
+    };
 
     return (
         <Container>
@@ -471,16 +549,33 @@ export default function LocationAdd() {
                                     <label>Main Image</label>
                                     <Button variant="contained" type="button" style={{ width: '100%' }} size="large" component="label">
                                         Image Upload
-                                        <input hidden accept="image/*" type="file" onChange={(e) => onSelectFile(e)} />
+                                        <input hidden type="file" accept="image/*" onChange={onSelectFile1} />
+                                        {/* <input hidden accept="image/*" type="file" onChange={(e) => onSelectFile(e)} /> */}
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={12} md={12} lg={12} mt={1}>
-                                    {(selectedFile || values.image ) && <img src={preview || values.image} style={{ width: '100px', height: '150px',  }} alt="" />}
+                                {/* <Grid item xs={12} sm={12} md={12} lg={12} mt={1}>
+                                    {(selectedFile || values.image) && <img src={preview || values.image} style={{ width: '100px', height: '150px', }} alt="" />}
+                                </Grid> */}
+                                <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                    {/* {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />} */}
+                                    {src && (
+                                        <ReactCrop
+                                            src={src}
+                                            crop={crop}
+                                            ruleOfThirds
+                                            onImageLoaded={onImageLoaded}
+                                            onComplete={onCropComplete}
+                                            onChange={onCropChange}
+                                        />
+                                    )}
+                                    {croppedImageUrl && (
+                                        <img alt="Crop" style={{ maxWidth: "100%" }} src={croppedImageUrl} />
+                                    )}
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid item xs={12} md={12} lg={12} mt={2} >
-                            <div {...getRootProps()} style={{marginBottom:'15px'}}>
+                            <div {...getRootProps()} style={{ marginBottom: '15px' }}>
                                 <input {...getInputProps()} />
                                 <Button variant="contained" type="button" style={{ width: '100%' }} size="large" component="label">
                                     Upload Images
