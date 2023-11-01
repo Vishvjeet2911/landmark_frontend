@@ -16,6 +16,7 @@ import PropertyAdd from './pages/property/PropertyAdd';
 import PropertyEdit from './pages/property/PropertyEdit';
 import Tasks from './pages/task';
 import Logout from './pages/logout';
+// import Test from './pages/property/test1'
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ export default function Router() {
         { path: '/property', element: <Property /> },
         { path: '/property-add', element: <PropertyAdd /> },
         { path: '/property-edit', element: <PropertyEdit /> },
-        // { path: '/property-owner', element: <PropertyOwner /> },
+        // { path: '/test', element: <Test /> },
         { path: '/tasks', element: <Tasks /> },
         { path: '/logout', element: <Logout /> },
         { path: '*', element: <Navigate to="/app" replace /> },

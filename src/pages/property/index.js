@@ -92,7 +92,7 @@ export default function Property() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
   const [filters, setFilters] = useState({
-    state_id: permission_check('admin') ? '' : account?.state?.id,
+    state_id: '',
     city_id: '',
     area_name: '',
     available_for: '',
@@ -433,12 +433,12 @@ export default function Property() {
           </Stack>
           <Stack direction="row" justifyContent="space-between" >
             <Grid container>
-              <Grid xs={12} sm={12} md={6} lg={6}>
+              <Grid item xs={12} sm={12} md={6} lg={6}>
                 <Typography variant="h4" gutterBottom>
                   Property
                 </Typography>
               </Grid>
-              <Grid xs={12} sm={12} md={6} lg={6} alignItems="right" >
+              <Grid item xs={12} sm={12} md={6} lg={6} alignItems="right" >
                 <Stack direction="row" spacing={1}>
                   <Stack direction="column">
                     {permission_check('property_create') ? <Button onClick={() => navigate('/property-add')} sx={{ float: 'right', marginY: '10px' }} variant="contained" startIcon={<AddIcon />}>

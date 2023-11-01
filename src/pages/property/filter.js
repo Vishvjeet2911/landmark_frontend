@@ -14,7 +14,7 @@ export default function Filter(props) {
     const { setFilters, onFilter, states } = props;
 
     const [values, setValues] = useState({
-        state_id: permission_check('admin') ? '' : account?.state?.id,
+        state_id: '',
         city_id: '',
         area_name: '',
         available_for: '',
@@ -22,7 +22,7 @@ export default function Filter(props) {
         minimum_area: '',
         maximum_area: ''
     });
-
+    const [stateData, setStateData] = useState([])
     const [cityData, setCityData] = useState([])
     const [areaData, setAreaData] = useState([])
     const [selectedState, setSelectedState] = useState({})
@@ -60,12 +60,15 @@ export default function Filter(props) {
         });
         onFilter(true);
     }
-
     useEffect(() => {
         if (!permission_check('admin')) {
-            handleCity(account?.state?.id)
+            let state_ids = account?.state_id.split(',').map(Number)
+            const filteredStates = states.filter(state => state_ids.includes(state?.id));
+            setStateData(filteredStates)
+        } else {
+            setStateData(states)
         }
-    }, [account?.state?.id])
+    }, [account?.state_id])
 
 
     const handleCity = (id) => {
@@ -80,29 +83,28 @@ export default function Filter(props) {
     }
     return (
         <Grid container spacing={2}>
-            {permission_check('admin') ?
-                <Grid item xs={12} md={6} lg={6} >
-                    <Autocomplete
-                        id="state"
-                        options={states}
-                        value={selectedState}
-                        size="small"
-                        getOptionLabel={(option) => option?.name || ''}
-                        onChange={(event, newValue) => {
-                            setSelectedState(newValue ? newValue : {})
-                            changeSelectValue(newValue ? newValue.id : '', 'state_id')
-                            handleCity(newValue ? newValue.id : 0)
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="outlined"
-                                label="Select State"
-                                placeholder="States"
-                            />
-                        )}
-                    />
-                </Grid> : ''}
+            <Grid item xs={12} md={6} lg={6} >
+                <Autocomplete
+                    id="state"
+                    options={stateData}
+                    value={selectedState}
+                    size="small"
+                    getOptionLabel={(option) => option?.name || ''}
+                    onChange={(event, newValue) => {
+                        setSelectedState(newValue ? newValue : {})
+                        changeSelectValue(newValue ? newValue.id : '', 'state_id')
+                        handleCity(newValue ? newValue.id : 0)
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            variant="outlined"
+                            label="Select State"
+                            placeholder="States"
+                        />
+                    )}
+                />
+            </Grid>
 
             <Grid item xs={12} md={6} lg={6} >
                 <Autocomplete
