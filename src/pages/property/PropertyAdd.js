@@ -555,236 +555,244 @@ export default function PropertyAdd() {
                                         {/* <input hidden accept="image/*" type="file" onChange={(e) => onSelectFile(e)} /> */}
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
-                                    {/* {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />} */}
-                                    {src && (
-                                        <ReactCrop
-                                            src={src}
-                                            crop={crop}
-                                            ruleOfThirds
-                                            onImageLoaded={onImageLoaded}
-                                            onComplete={onCropComplete}
-                                            onChange={onCropChange}
-                                        />
-                                    )}
-                                    {croppedImageUrl && (
-                                        <img alt="Crop" style={{ maxWidth: "100%" }} src={croppedImageUrl} />
-                                    )}
+                                <Grid item xs={12} sm={12} md={10} lg={10} mt={1}>
+                                    <Grid container>
+                                        <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                            {/* {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />} */}
+                                            {src && (
+                                                <ReactCrop
+                                                    src={src}
+                                                    crop={crop}
+                                                    ruleOfThirds
+                                                    onImageLoaded={onImageLoaded}
+                                                    onComplete={onCropComplete}
+                                                    onChange={onCropChange}
+                                                    style={{ maxWidth: "200px" }}
+  
+                                                />
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                        {croppedImageUrl && (
+                                            <img alt="Crop" style={{ maxWidth: "200%" }} src={croppedImageUrl} />
+                                        )}
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={12} md={12} lg={12} mt={2} >
-                            <div {...getRootProps()} style={{ marginBottom: '15px' }}>
-                                <input {...getInputProps()} />
-                                <Button variant="contained" type="button" style={{ width: '100%' }} size="large" component="label">
-                                    Upload Images
-                                </Button>
-                            </div>
-                            <Paper elevation={0} mt={3} >
-                                <Grid container >
-                                    {uploadedImages.map((imageData, index) => (
-                                        <Grid item xs={12} sm={6} md={4} lg={3} mt={2}>
-                                            <Grid container>
-                                                <Grid item xs={4} md={4} lg={4} >
-                                                    <img style={{ width: '100px' }} alt={`Image ${index}`} src={imageData} />
-                                                </Grid>
-                                                <Grid item xs={2} md={2} lg={2} >
-                                                    <IconButton
-                                                        color="error"
-                                                        onClick={() => onDeleteImage(index)}
-                                                    >
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={12} lg={12} mt={2} >
+                        <div {...getRootProps()} style={{ marginBottom: '15px' }}>
+                            <input {...getInputProps()} />
+                            <Button variant="contained" type="button" style={{ width: '100%' }} size="large" component="label">
+                                Upload Images
+                            </Button>
+                        </div>
+                        <Paper elevation={0} mt={3} >
+                            <Grid container >
+                                {uploadedImages.map((imageData, index) => (
+                                    <Grid item xs={12} sm={6} md={4} lg={3} mt={2}>
+                                        <Grid container>
+                                            <Grid item xs={4} md={4} lg={4} >
+                                                <img style={{ width: '100px' }} alt={`Image ${index}`} src={imageData} />
+                                            </Grid>
+                                            <Grid item xs={2} md={2} lg={2} >
+                                                <IconButton
+                                                    color="error"
+                                                    onClick={() => onDeleteImage(index)}
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
                                             </Grid>
                                         </Grid>
-                                    ))}
-                                </Grid>
-                            </Paper>
-                        </Grid>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Paper>
                     </Grid>
-                    <Typography mt={3} variant="h5">Additional Details</Typography>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6} lg={6} mt={2}>
-                            <FormControl fullWidth>
-                                <InputLabel id="available_for">Space for Signage</InputLabel>
-                                <Select
-                                    labelId="available_for"
-                                    id="demo-simple-select"
-                                    label="Space for Signage"
-                                    {...getFieldProps('signage_space')}
-                                    error={Boolean(touched.signage_space && errors.signage_space)}
-                                    helpertext={touched.signage_space && errors.signage_space}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} mt={2}>
-                            <FormControl fullWidth>
-                                <InputLabel id="available_for">Space for Earthing</InputLabel>
-                                <Select
-                                    labelId="available_for"
-                                    id="demo-simple-select"
-                                    label="Space for Earthing"
-                                    {...getFieldProps('earthing_space')}
-                                    error={Boolean(touched.earthing_space && errors.earthing_space)}
-                                    helpertext={touched.earthing_space && errors.earthing_space}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Space for RF / V-SAT Antennas</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Space for RF / V-SAT Antennas"
-                                    {...getFieldProps('antenna_space')}
-                                    error={Boolean(touched.antenna_space && errors.antenna_space)}
-                                    helpertext={touched.antenna_space && errors.antenna_space}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Space for AC Outdoor Units</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Space for AC Outdoor Units"
-                                    {...getFieldProps('ac_outdoor_unit_space')}
-                                    error={Boolean(touched.ac_outdoor_unit_space && errors.ac_outdoor_unit_space)}
-                                    helpertext={touched.ac_outdoor_unit_space && errors.ac_outdoor_unit_space}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                    <MenuItem value="Centralized AC to be provided by the Owner">Centralized AC to be provided by the Owner</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Space for DG</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Space for DG"
-                                    {...getFieldProps('dg_space')}
-                                    error={Boolean(touched.dg_space && errors.dg_space)}
-                                    helpertext={touched.dg_space && errors.dg_space}
-                                >
-                                    <MenuItem value="Space Available on Terrace">Space Available on Terrace</MenuItem>
-                                    <MenuItem value="Space Available on the Ground Floor">Space Available on the Ground Floor</MenuItem>
-                                    <MenuItem value="Space Available back">Space Available back</MenuItem>
-                                    <MenuItem value="Front side of the premises">Front side of the premises</MenuItem>
-                                    <MenuItem value="Space Not Available">Space Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Rolling Shutter</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Rolling Shutter"
-                                    {...getFieldProps('rolling_shutter')}
-                                    error={Boolean(touched.rolling_shutter && errors.rolling_shutter)}
-                                    helpertext={touched.rolling_shutter && errors.rolling_shutter}
-                                >
-                                    <MenuItem value="To be provided by the Owner">To be provided by the Owner</MenuItem>
-                                    <MenuItem value="Not Allowed in the premises">Not Allowed in the premises</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Power Back up</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Power Back up"
-                                    {...getFieldProps('power_backup')}
-                                    error={Boolean(touched.power_backup && errors.power_backup)}
-                                    helpertext={touched.power_backup && errors.power_backup}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Availability of Lift</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Availability of Lift"
-                                    {...getFieldProps('lift')}
-                                    error={Boolean(touched.lift && errors.lift)}
-                                    helpertext={touched.lift && errors.lift}
-                                >
-                                    <MenuItem value="Available">Available</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                    <MenuItem value="With Lift Provision">With Lift Provision</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Parking</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Parking"
-                                    {...getFieldProps('parking')}
-                                    error={Boolean(touched.parking && errors.parking)}
-                                    helpertext={touched.parking && errors.parking}
-                                >
-                                    <MenuItem value="Basement">Basement</MenuItem>
-                                    <MenuItem value="In front of the building">In front of the building</MenuItem>
-                                    <MenuItem value="Around the building">Around the building</MenuItem>
-                                    <MenuItem value="Not Available">Not Available</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Existing Tenants"
-                                {...getFieldProps('exist_tenants')}
-                                error={Boolean(touched.exist_tenants && errors.exist_tenants)}
-                                helperText={touched.exist_tenants && errors.exist_tenants}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <FormControl fullWidth>
-                                <InputLabel id="">Owner / Premises Ranking</InputLabel>
-                                <Select
-                                    labelId=""
-                                    id="demo-simple-select"
-                                    label="Owner / Premises Ranking"
-                                    {...getFieldProps('ranking')}
-                                    error={Boolean(touched.ranking && errors.ranking)}
-                                    helpertext={touched.ranking && errors.ranking}
-                                >
-                                    <MenuItem value="A">A</MenuItem>
-                                    <MenuItem value="B">B</MenuItem>
-                                    <MenuItem value="C">C</MenuItem>
-                                    <MenuItem value="D">D</MenuItem>
-                                </Select>
-                            </FormControl>
-                            {/* <TextField
+                </Grid>
+                <Typography mt={3} variant="h5">Additional Details</Typography>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6} lg={6} mt={2}>
+                        <FormControl fullWidth>
+                            <InputLabel id="available_for">Space for Signage</InputLabel>
+                            <Select
+                                labelId="available_for"
+                                id="demo-simple-select"
+                                label="Space for Signage"
+                                {...getFieldProps('signage_space')}
+                                error={Boolean(touched.signage_space && errors.signage_space)}
+                                helpertext={touched.signage_space && errors.signage_space}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} mt={2}>
+                        <FormControl fullWidth>
+                            <InputLabel id="available_for">Space for Earthing</InputLabel>
+                            <Select
+                                labelId="available_for"
+                                id="demo-simple-select"
+                                label="Space for Earthing"
+                                {...getFieldProps('earthing_space')}
+                                error={Boolean(touched.earthing_space && errors.earthing_space)}
+                                helpertext={touched.earthing_space && errors.earthing_space}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Space for RF / V-SAT Antennas</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Space for RF / V-SAT Antennas"
+                                {...getFieldProps('antenna_space')}
+                                error={Boolean(touched.antenna_space && errors.antenna_space)}
+                                helpertext={touched.antenna_space && errors.antenna_space}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Space for AC Outdoor Units</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Space for AC Outdoor Units"
+                                {...getFieldProps('ac_outdoor_unit_space')}
+                                error={Boolean(touched.ac_outdoor_unit_space && errors.ac_outdoor_unit_space)}
+                                helpertext={touched.ac_outdoor_unit_space && errors.ac_outdoor_unit_space}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                                <MenuItem value="Centralized AC to be provided by the Owner">Centralized AC to be provided by the Owner</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Space for DG</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Space for DG"
+                                {...getFieldProps('dg_space')}
+                                error={Boolean(touched.dg_space && errors.dg_space)}
+                                helpertext={touched.dg_space && errors.dg_space}
+                            >
+                                <MenuItem value="Space Available on Terrace">Space Available on Terrace</MenuItem>
+                                <MenuItem value="Space Available on the Ground Floor">Space Available on the Ground Floor</MenuItem>
+                                <MenuItem value="Space Available back">Space Available back</MenuItem>
+                                <MenuItem value="Front side of the premises">Front side of the premises</MenuItem>
+                                <MenuItem value="Space Not Available">Space Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Rolling Shutter</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Rolling Shutter"
+                                {...getFieldProps('rolling_shutter')}
+                                error={Boolean(touched.rolling_shutter && errors.rolling_shutter)}
+                                helpertext={touched.rolling_shutter && errors.rolling_shutter}
+                            >
+                                <MenuItem value="To be provided by the Owner">To be provided by the Owner</MenuItem>
+                                <MenuItem value="Not Allowed in the premises">Not Allowed in the premises</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Power Back up</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Power Back up"
+                                {...getFieldProps('power_backup')}
+                                error={Boolean(touched.power_backup && errors.power_backup)}
+                                helpertext={touched.power_backup && errors.power_backup}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Availability of Lift</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Availability of Lift"
+                                {...getFieldProps('lift')}
+                                error={Boolean(touched.lift && errors.lift)}
+                                helpertext={touched.lift && errors.lift}
+                            >
+                                <MenuItem value="Available">Available</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                                <MenuItem value="With Lift Provision">With Lift Provision</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Parking</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Parking"
+                                {...getFieldProps('parking')}
+                                error={Boolean(touched.parking && errors.parking)}
+                                helpertext={touched.parking && errors.parking}
+                            >
+                                <MenuItem value="Basement">Basement</MenuItem>
+                                <MenuItem value="In front of the building">In front of the building</MenuItem>
+                                <MenuItem value="Around the building">Around the building</MenuItem>
+                                <MenuItem value="Not Available">Not Available</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <TextField
+                            fullWidth
+                            type="text"
+                            variant="outlined"
+                            label="Existing Tenants"
+                            {...getFieldProps('exist_tenants')}
+                            error={Boolean(touched.exist_tenants && errors.exist_tenants)}
+                            helperText={touched.exist_tenants && errors.exist_tenants}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <FormControl fullWidth>
+                            <InputLabel id="">Owner / Premises Ranking</InputLabel>
+                            <Select
+                                labelId=""
+                                id="demo-simple-select"
+                                label="Owner / Premises Ranking"
+                                {...getFieldProps('ranking')}
+                                error={Boolean(touched.ranking && errors.ranking)}
+                                helpertext={touched.ranking && errors.ranking}
+                            >
+                                <MenuItem value="A">A</MenuItem>
+                                <MenuItem value="B">B</MenuItem>
+                                <MenuItem value="C">C</MenuItem>
+                                <MenuItem value="D">D</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {/* <TextField
                                 fullWidth
                                 type="text"
                                 variant="outlined"
@@ -793,45 +801,45 @@ export default function PropertyAdd() {
                                 error={Boolean(touched.ranking && errors.ranking)}
                                 helperText={touched.ranking && errors.ranking}
                             /> */}
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Remarks : Owner's Scope of Work - Floor wise"
-                                {...getFieldProps('remarks')}
-                                error={Boolean(touched.remarks && errors.remarks)}
-                                helperText={touched.remarks && errors.remarks}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Other Remarks"
-                                {...getFieldProps('other_remarks')}
-                                error={Boolean(touched.other_remarks && errors.other_remarks)}
-                                helperText={touched.other_remarks && errors.other_remarks}
-                            />
-                        </Grid>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <TextField
+                            fullWidth
+                            type="text"
+                            variant="outlined"
+                            label="Remarks : Owner's Scope of Work - Floor wise"
+                            {...getFieldProps('remarks')}
+                            error={Boolean(touched.remarks && errors.remarks)}
+                            helperText={touched.remarks && errors.remarks}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6} >
+                        <TextField
+                            fullWidth
+                            type="text"
+                            variant="outlined"
+                            label="Other Remarks"
+                            {...getFieldProps('other_remarks')}
+                            error={Boolean(touched.other_remarks && errors.other_remarks)}
+                            helperText={touched.other_remarks && errors.other_remarks}
+                        />
+                    </Grid>
 
-                    </Grid>
-                    <Grid item xs={12} md={12} lg={12} mt={2}>
-                        <Stack direction="row" sx={{ float: 'right', marginTop: '15px' }}>
-                            <LoadingButton
-                                type="submit"
-                                variant="contained"
-                                sx={{ fontSize: '1.2rem' }}
-                                loading={btnLoad}
-                            >
-                                Save
-                            </LoadingButton>
-                        </Stack>
-                    </Grid>
-                </Form>
-            </FormikProvider>
-        </Container>
+                </Grid>
+                <Grid item xs={12} md={12} lg={12} mt={2}>
+                    <Stack direction="row" sx={{ float: 'right', marginTop: '15px' }}>
+                        <LoadingButton
+                            type="submit"
+                            variant="contained"
+                            sx={{ fontSize: '1.2rem' }}
+                            loading={btnLoad}
+                        >
+                            Save
+                        </LoadingButton>
+                    </Stack>
+                </Grid>
+            </Form>
+        </FormikProvider>
+        </Container >
     );
 }

@@ -543,7 +543,7 @@ export default function LocationAdd() {
                     </Grid>
                     <Typography mt={3} variant="h5"> Property Image</Typography>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} md={6} lg={6} mt={2}>
+                        <Grid item xs={12} md={12} lg={12} mt={2}>
                             <Grid container>
                                 <Grid item xs={12} sm={12} md={12} lg={12}>
                                     <label>Main Image</label>
@@ -556,21 +556,28 @@ export default function LocationAdd() {
                                 {/* <Grid item xs={12} sm={12} md={12} lg={12} mt={1}>
                                     {(selectedFile || values.image) && <img src={preview || values.image} style={{ width: '100px', height: '150px', }} alt="" />}
                                 </Grid> */}
-                                <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
-                                    {/* {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />} */}
-                                    {src && (
-                                        <ReactCrop
-                                            src={src}
-                                            crop={crop}
-                                            ruleOfThirds
-                                            onImageLoaded={onImageLoaded}
-                                            onComplete={onCropComplete}
-                                            onChange={onCropChange}
-                                        />
-                                    )}
-                                    {croppedImageUrl && (
-                                        <img alt="Crop" style={{ maxWidth: "100%" }} src={croppedImageUrl} />
-                                    )}
+                                <Grid item xs={12} sm={12} md={10} lg={10} mt={1}>
+                                    <Grid container>
+                                        <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                            {/* {(selectedFile) && <img src={preview} style={{ width: '100px', height: '150px', }} alt="" />} */}
+                                            {src && (
+                                                <ReactCrop
+                                                    src={src}
+                                                    crop={crop}
+                                                    ruleOfThirds
+                                                    onImageLoaded={onImageLoaded}
+                                                    onComplete={onCropComplete}
+                                                    onChange={onCropChange}
+                                                    style={{ maxWidth: "200px" }}
+                                                />
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} sm={12} md={6} lg={6} mt={1}>
+                                            {croppedImageUrl && (
+                                                <img alt="Crop" style={{ maxWidth: "200px" }} src={croppedImageUrl} />
+                                            )}
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
