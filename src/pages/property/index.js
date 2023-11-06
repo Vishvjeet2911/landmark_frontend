@@ -21,6 +21,8 @@ import UploadIcon from '@mui/icons-material/Upload';
 import AddIcon from '@mui/icons-material/Add';
 import account from 'src/_mock/account';
 import { permission_check } from 'src/_mock/permission_check';
+import ExcelJS from 'exceljs';
+
 // import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
 // @mui
 import {
@@ -230,60 +232,112 @@ export default function Property() {
       .then((response) => response.json())
       .then((data) => {
         setExportLoad(false)
-        if ('error' in data) {
-          toast.error(data?.message)
-          setLoader(false)
-          setExportLoad(false)
-          if (data?.message === 'Please login first') {
-            navigate('/logout', { replace: true });
-          }
-        } else {
-          if (data && data.length > 0) {
-            let respData = []
-            data.forEach(element => {
-              let a = {
-                'Property name': element?.property_name,
-                'State Name': element?.states?.name,
-                'City Name': element?.cities?.name,
-                'Area Name': element?.areas?.name,
-                'Landmark': element?.landmark,
-                'Owner name': element?.owner_name,
-                'Owner mobile': element?.owner_mobile,
-                'Owner email': element?.owner_email,
-                'Owner remarks': element?.owner_remarks,
-                'Available for': element?.available_for,
-                'Nature of premises': element?.nature_of_premises,
-                'Minimum area': element?.minimum_area,
-                'Maximum area': element?.maximum_area,
-                'Area Avaliable': element?.area_avaliable,
-                'Premises condition': element?.premises_condition,
-                'Per sq rate': element?.per_sq_rate,
-                'Maintenance charge': element?.maintenance_charge,
-                'Signage space': element?.signage_space,
-                'Earthing space': element?.earthing_space,
-                'Antenna space': element?.antenna_space,
-                'AC outdoor unit space': element?.ac_outdoor_unit_space,
-                'Dg space': element?.dg_space,
-                'Rolling shutter': element?.rolling_shutter,
-                'Power backup': element?.power_backup,
-                'Lift': element?.lift,
-                'Parking': element?.parking,
-                'Exist tenants': element?.exist_tenants,
-                'Ranking': element?.ranking,
-                'Remarks': element?.remarks,
-                'Other remarks': element?.other_remarks,
-                'Updated by': element?.user?.name,
-                'status': element?.status,
-                'Last updated at': new Date(element?.updatedAt).toLocaleDateString(),
-              }
-              respData.push(a)
+        try {
+          const workbook = new ExcelJS.Workbook();
+          const sheet = workbook.addWorksheet("Data");
+          sheet.properties.defaultRowHeight = 120;
+          sheet.columns = [
+            { header: "Image", key: "image", width: "30" },
+            { header: "Property Name", key: "property_name" },
+            { header: "State", key: 'states' },
+            { header: "City", key: 'cities' },
+            { header: "Areas", key: 'areas' },
+            { header: "Landmark", key: 'landmark' },
+            { header: "Owner Name", key: 'owner_name' },
+            { header: "Owner Mobile", key: 'owner_mobile' },
+            { header: "Owner Email", key: 'owner_email' },
+            { header: "Owner Remarks", key: 'owner_remarks' },
+            { header: "Available For", key: 'available_for' },
+            { header: "Nature of Premises", key: 'nature_of_premises' },
+            { header: "Minimum area", key: 'minimum_area' },
+            { header: "Maximum area ", key: 'maximum_area' },
+            { header: "Area available", key: 'area_avaliable' },
+            { header: "Premises condition", key: 'premises_condition' },
+            { header: "Per sq. rate", key: 'per_sq_rate' },
+            { header: "Maintenance charge", key: 'maintenance_charge' },
+            { header: "Signage space", key: 'signage_space' },
+            { header: "Earthing space", key: 'earthing_space' },
+            { header: "Antenna space", key: 'antenna_space' },
+            { header: "AC outdoor unit space", key: 'ac_outdoor_unit_space' },
+            { header: "DG space", key: 'dg_space' },
+            { header: "Rolling shutter", key: 'rolling_shutter' },
+            { header: "Power backup", key: 'power_backup' },
+            { header: "Lift", key: 'lift' },
+            { header: "Parking", key: 'parking' },
+            { header: "Exist tenants", key: 'exist_tenants' },
+            { header: "Ranking", key: 'ranking' },
+            { header: "Reamrks", key: 'remarks' },
+            { header: "Other reamrks", key: 'other_remarks' },
+            { header: "User Name", key: 'user_name' },
+            { header: "Status", key: 'status' },
+            { header: "UpdatedAT", key: 'updatedAt' },
+          ];
+          const promise = Promise.all(
+            data?.map(async (element, index) => {
+              const rowNumber = index + 1;
+              sheet.addRow({
+                property_name: element?.property_name,
+                states: element?.states?.name,
+                cities: element?.cities?.name,
+                areas: element?.areas?.name,
+                landmark: element?.landmark,
+                owner_name: element?.owner_name,
+                owner_mobile: element?.owner_mobile,
+                owner_email: element?.owner_email,
+                owner_remarks: element?.owner_remarks,
+                available_for: element?.available_for,
+                nature_of_premises: element?.nature_of_premises,
+                minimum_area: element?.minimum_area,
+                maximum_area: element?.maximum_area,
+                area_avaliable: element?.area_avaliable,
+                premises_condition: element?.premises_condition,
+                per_sq_rate: element?.per_sq_rate,
+                maintenance_charge: element?.maintenance_charge,
+                signage_space: element?.signage_space,
+                earthing_space: element?.earthing_space,
+                antenna_space: element?.antenna_space,
+                ac_outdoor_unit_space: element?.ac_outdoor_unit_space,
+                dg_space: element?.dg_space,
+                rolling_shutter: element?.rolling_shutter,
+                power_backup: element?.power_backup,
+                lift: element?.lift,
+                parking: element?.parking,
+                exist_tenants: element?.exist_tenants,
+                ranking: element?.ranking,
+                remarks: element?.remarks,
+                other_remarks: element?.other_remarks,
+                user_name: element?.user?.name,
+                status: element?.status,
+                updatedAt: new Date(element?.updatedAt).toLocaleDateString(),
+              });
+              const type = element?.image.split(';')[0].split('/')[1];
+              const imageId2 = workbook.addImage({
+                base64: element?.image,
+                extension: type,
+              });
+
+              sheet.addImage(imageId2, {
+                tl: { col: 0, row: rowNumber },
+                ext: { width: 200, height: 200 },
+              });
+            })
+          );
+
+          promise.then(() => {
+            workbook.xlsx.writeBuffer().then(function (data) {
+              const blob = new Blob([data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              });
+              const url = window.URL.createObjectURL(blob);
+              const anchor = document.createElement("a");
+              anchor.href = url;
+              anchor.download = "export.xlsx";
+              anchor.click();
+              window.URL.revokeObjectURL(url);
             });
-            var workbook = XLSX.utils.book_new();
-            var ws1 = XLSX.utils.json_to_sheet(respData);
-            XLSX.utils.book_append_sheet(workbook, ws1, "data");
-            XLSX.writeFile(workbook, 'property.xlsx', { type: 'file' });
-            setExportLoad(false)
-          }
+          });
+        } catch (error) {
+
         }
       }).catch(error => {
         setExportLoad(false)
