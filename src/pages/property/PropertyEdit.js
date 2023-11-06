@@ -16,8 +16,13 @@ import Dropzone, { useDropzone } from 'react-dropzone'
 import DeleteIcon from '@mui/icons-material/Delete';
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // ----------------------------------------------------------------------
 
+const editorConfiguration = {
+    toolbar: ['bold', 'italic', 'heading', '|', 'outdent', 'indent', '|', 'bulletedList', 'numberedList', '|','typography',]
+};
 export default function LocationAdd() {
     const navigate = useNavigate();
     const accessToken = localStorage.getItem('lm_token')
@@ -140,6 +145,7 @@ export default function LocationAdd() {
             lift: currentData?.lift ? currentData?.lift : '',
             parking: currentData?.parking ? currentData?.parking : '',
             exist_tenants: currentData?.exist_tenants ? currentData?.exist_tenants : '',
+            building_height: currentData?.building_height ? currentData?.building_height : '',
             ranking: currentData?.ranking ? currentData?.ranking : '',
             remarks: currentData?.remarks ? currentData?.remarks : '',
             other_remarks: currentData?.other_remarks ? currentData?.other_remarks : '',
@@ -496,47 +502,63 @@ export default function LocationAdd() {
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Area Avaliable"
-                                {...getFieldProps('area_avaliable')}
-                                error={Boolean(touched.area_avaliable && errors.area_avaliable)}
-                                helperText={touched.area_avaliable && errors.area_avaliable}
+                            <label>Area Avaliable</label>
+                            <CKEditor
+                                data={values.area_avaliable}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("area_avaliable", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Premises Condition"
-                                {...getFieldProps('premises_condition')}
-                                error={Boolean(touched.premises_condition && errors.premises_condition)}
-                                helperText={touched.premises_condition && errors.premises_condition}
+                            <label>Premises Condition</label>
+                            <CKEditor
+                                data={values.premises_condition}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("premises_condition", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Per sq.ft Rate"
-                                {...getFieldProps('per_sq_rate')}
-                                error={Boolean(touched.per_sq_rate && errors.per_sq_rate)}
-                                helperText={touched.per_sq_rate && errors.per_sq_rate}
+                            <label>Per sq.ft Rate</label>
+                            <CKEditor
+                                data={values.per_sq_rate}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("per_sq_rate", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
-                                fullWidth
-                                type="text"
-                                variant="outlined"
-                                label="Maintainance Charges"
-                                {...getFieldProps('maintenance_charge')}
-                                error={Boolean(touched.maintenance_charge && errors.maintenance_charge)}
-                                helperText={touched.maintenance_charge && errors.maintenance_charge}
+                            <label>Maintainance Charges</label>
+                            <CKEditor
+                                data={values.maintenance_charge}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("maintenance_charge", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
 
@@ -773,6 +795,17 @@ export default function LocationAdd() {
                                 {...getFieldProps('exist_tenants')}
                                 error={Boolean(touched.exist_tenants && errors.exist_tenants)}
                                 helperText={touched.exist_tenants && errors.exist_tenants}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6} lg={6} >
+                            <TextField
+                                fullWidth
+                                type="text"
+                                variant="outlined"
+                                label="Building Height"
+                                {...getFieldProps('building_height')}
+                                error={Boolean(touched.building_height && errors.building_height)}
+                                helperText={touched.building_height && errors.building_height}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
