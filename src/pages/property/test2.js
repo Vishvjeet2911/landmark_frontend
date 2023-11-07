@@ -1,22 +1,34 @@
 import React, { useEffect, useState } from "react";
 const ExcelJS = require("exceljs");
 
-const token = localStorage.getItem('lm_token')
+const toDataURL = (url) => {
+  const promise = new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      var reader = new FileReader();
+      reader.readAsDataURL(xhr.response);
+      reader.onloadend = function () {
+        resolve({ base64Url: reader.result });
+      };
+    };
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.send();
+  });
+
+  return promise;
+};
+
 const App = () => {
   const [data, setData] = useState([]);
   useEffect(() => {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      },
-    };
-    fetch(`${process.env.REACT_APP_SITE_URL}property/export`, requestOptions)
+    fetch("https://dummyjson.com/products")
       .then((res) => res.json())
       .then(async (data) => {
         console.log(data);
         setData(data);
       })
+      .then((json) => console.log(json));
   }, []);
 
   const exportExcelFile = () => {
@@ -79,22 +91,24 @@ const App = () => {
     ];
 
     const promise = Promise.all(
-      data?.map(async (product, index) => {
+      data?.products?.map(async (product, index) => {
         const rowNumber = index + 1;
         sheet.addRow({
           id: product?.id,
-          title: product?.available_for,
-          brand: product?.owner_name,
-          category: product?.owner_mobile,
-          price: product?.nature_of_premises,
-          rating: product?.available_for,
+          title: product?.title,
+          brand: product?.brand,
+          category: product?.category,
+          price: product?.price,
+          rating: product?.rating,
         });
-        console.log(product?.image);
-        const type = product?.image.split(';')[0].split('/')[1];
-        console.log(type)
+        console.log(product?.thumbnail);
+        const result = await toDataURL(product?.thumbnail);
+        const splitted = product?.thumbnail.split(".");
+        const extName = splitted[splitted.length - 1];
+
         const imageId2 = workbook.addImage({
-          base64: product?.image,
-          extension: type,
+          base64: result.base64Url,
+          extension: extName,
         });
 
         sheet.addImage(imageId2, {
@@ -105,6 +119,21 @@ const App = () => {
     );
 
     promise.then(() => {
+      const priceCol = sheet.getColumn(5);
+
+      // iterate over all current cells in this column
+      priceCol.eachCell((cell) => {
+        const cellValue = sheet.getCell(cell?.address).value;
+        // add a condition to set styling
+        if (cellValue > 50 && cellValue < 1000) {
+          sheet.getCell(cell?.address).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF0000" },
+          };
+        }
+      });
+
       workbook.xlsx.writeBuffer().then(function (data) {
         const blob = new Blob([data], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -141,8 +170,8 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(data) &&
-            data?.map((row) => (
+          {Array.isArray(data?.products) &&
+            data?.products?.map((row) => (
               <tr>
                 <td>{row?.id}</td>
                 <td>{row?.title}</td>
@@ -151,7 +180,7 @@ const App = () => {
                 <td>${row?.price}</td>
                 <td>{row?.rating}/5</td>
                 <td>
-                  <img src={row?.image} width="100" />
+                  <img src={row?.thumbnail} width="100" />
                 </td>
               </tr>
             ))}

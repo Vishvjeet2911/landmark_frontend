@@ -246,12 +246,29 @@ export default function LocationAdd() {
 
     const makeClientCrop = async (crop) => {
         if (imageRef.current && crop.width && crop.height) {
-            const newCroppedImageUrl = await getCroppedImg(
+            const newCroppedBlobUrl = await getCroppedImg(
                 imageRef.current,
                 crop,
                 "newFile.jpeg"
             );
-            setCroppedImageUrl(newCroppedImageUrl);
+            fetch(newCroppedBlobUrl)
+                .then((response) => response.blob())
+                .then((blob) => {
+                    // Convert the fetched Blob to base64
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        const base64CroppedImage = e.target.result;
+
+                        // Now you have the base64 representation of the cropped image
+                        setCroppedImageUrl(base64CroppedImage);
+                    };
+
+                    reader.readAsDataURL(blob);
+                })
+                .catch((error) => {
+                    console.error("Error fetching Blob data:", error);
+                });
         }
     };
 
@@ -288,6 +305,7 @@ export default function LocationAdd() {
         });
     };
 
+    console.log(src, croppedImageUrl)
     return (
         <Container>
             <FormikProvider value={formik}>
