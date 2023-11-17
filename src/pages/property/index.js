@@ -468,8 +468,7 @@ export default function Property() {
       <Helmet>
         <title> Property </title>
       </Helmet>
-      {loader ?
-        <Grid sx={{ width: '100%', height: '100vh', textAlign: 'center' }} ><CircularProgress sx={{ color: '#c5c7cf', margin: '0 auto', marginTop: '40%' }} /></Grid> :
+     
         <Container maxWidth="xl">
           <Stack mb={3}>
             <Accordion sx={{ border: '1px solid #37474f' }}>
@@ -485,7 +484,10 @@ export default function Property() {
               </AccordionDetails>
             </Accordion>
           </Stack>
-          <Stack direction="row" justifyContent="space-between" >
+          {loader ?
+        <Grid sx={{ width: '100%', height: '100vh', textAlign: 'center' }} ><CircularProgress sx={{ color: '#c5c7cf', margin: '0 auto', marginTop: '40%' }} /></Grid> :
+        <>
+        <Stack direction="row" justifyContent="space-between" >
             <Grid container>
               <Grid item xs={12} sm={12} md={6} lg={6}>
                 <Typography variant="h4" gutterBottom>
@@ -513,6 +515,7 @@ export default function Property() {
               </Grid>
             </Grid>
           </Stack>
+
           <Card>
 
             <Scrollbar>
@@ -570,6 +573,8 @@ export default function Property() {
             </Grid>
 
           </Card>
+          </>}
+
           <Popup title="Add Property" openPopup={open} setOpenPopup={setOpenPopup}>
             <PropertyAdd popup={open} popupChange={setOpenPopup} locationData={locationData} accessToken={token} />
           </Popup>
@@ -579,7 +584,7 @@ export default function Property() {
           <Popup title="Property Details" openPopup={openView} setOpenPopup={setViewOpenPopup} width="lg">
             <View popup={openView} popupChange={setViewOpenPopup} accessToken={token} currentData={currentData} />
           </Popup>
-        </Container>}
+        </Container>
       <Dialog
         ref={dialogBox}
         open={openConfirmPending}

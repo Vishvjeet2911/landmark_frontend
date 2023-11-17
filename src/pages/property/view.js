@@ -65,16 +65,16 @@ export default function LocationAdd({ currentData, popupChange }) {
                 <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Maximum Area Available:</span><br /> {currentData?.maximum_area}</Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Area Available:</span><br /> {currentData?.area_avaliable}</Typography>
+                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Area Available:</span><br /> <div dangerouslySetInnerHTML={{ __html: currentData?.area_avaliable}} /></Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Premises Condition:</span><br /> {currentData?.premises_condition}</Typography>
+                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Premises Condition:</span><br />  <div dangerouslySetInnerHTML={{ __html: currentData?.premises_condition}} /></Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Per sq.ft Rate:</span><br /> {currentData?.per_sq_rate}</Typography>
+                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Per sq.ft Rate:</span><br /> <div dangerouslySetInnerHTML={{ __html: currentData?.per_sq_rate}} /> </Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Maintenance Charges:</span><br /> {currentData?.maintenance_charge}</Typography>
+                <Typography sx={{ fontSize: '0.875rem' }}><span style={{ fontWeight: '600' }}>Maintenance Charges:</span><br /> <div dangerouslySetInnerHTML={{ __html: currentData?.maintenance_charge}} /> </Typography>
             </Grid>
             <Grid item xs={12}>
                 <Typography variant="body1" color="blue" >Additional Details</Typography>
