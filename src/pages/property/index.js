@@ -159,6 +159,7 @@ export default function Property() {
   }
 
   const otherData = async () => {
+    setLoader(true)
     const requestOptions = {
       method: "GET",
       headers: {
@@ -166,12 +167,13 @@ export default function Property() {
         "Authorization": `Bearer ${token}`
       },
     };
-    fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
+    await fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data?.data)
         setStateData(data?.data?.states)
-        setAreaData(data?.data?.areas)
       });
+      setLoader(false)
   }
   useEffect(() => {
     otherData()
@@ -191,7 +193,7 @@ export default function Property() {
         'Authorization': `Bearer ${token}`
       },
     };
-    fetch(`${process.env.REACT_APP_SITE_URL}location/${id}`, requestOptions)
+    fetch(`${process.env.REACT_APP_SITE_URL}property/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
         toast.success('Delete Successfully')
@@ -480,7 +482,7 @@ export default function Property() {
                 <Typography variant="h6">Filter</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <FilterPopup setFilters={setFilters} onFilter={setOnFilters} states={stateData} areas={areaData} />
+                <FilterPopup setFilters={setFilters} onFilter={setOnFilters} states={stateData} />
               </AccordionDetails>
             </Accordion>
           </Stack>

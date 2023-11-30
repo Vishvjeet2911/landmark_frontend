@@ -127,7 +127,24 @@ export default function Task() {
       navigate('/logout')
     }
   }
-
+  const handleDelete = (id) => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    };
+    fetch(`${process.env.REACT_APP_SITE_URL}task/${id}`, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        toast.success('Delete Successfully')
+        callApi()
+        getAllUsers()
+      }).catch(error => {
+        toast.error(error?.message)
+      });
+  }
   const getAllUsers = () => {
     const requestOptions = {
       method: "GET",
@@ -231,9 +248,9 @@ export default function Task() {
                           {permission_check('task_edit') ? <IconButton onClick={() => handleEditClick(row)}>
                             <Iconify sx={{ color: 'blue' }} icon={'eva:edit-fill'} />
                           </IconButton> : ''}
-                          {/* <IconButton onClick={() => handleDelete(row?.id)}>
+                          {permission_check('task_delete') ?  <IconButton onClick={() => handleDelete(row?.id)}>
                             <Iconify sx={{ color: '#db0011' }} icon={'eva:trash-2-outline'} />
-                          </IconButton> */}
+                          </IconButton> : ''}
                         </StyledTableCell>
                       </StyledTableRow>
                     ))}

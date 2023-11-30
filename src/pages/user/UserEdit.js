@@ -176,7 +176,7 @@ export default function RoleAdd(props) {
                         </Select>
                     </FormControl>
                 </Stack>
-                <Stack mt={2}>
+                {/* <Stack mt={2}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Select state</InputLabel>
                         <Select
@@ -193,7 +193,7 @@ export default function RoleAdd(props) {
                         </Select>
                     </FormControl>
                   
-                </Stack>
+                </Stack> */}
                 <Stack mt={2}>
                     <Autocomplete
                         multiple

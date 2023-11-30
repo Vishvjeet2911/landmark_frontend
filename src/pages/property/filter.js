@@ -39,7 +39,6 @@ export default function Filter(props) {
         setFilters(values);
         onFilter(true);
         setValues(values)
-        console.log(values)
     }
     const handleResetClick = () => {
         setValues({
