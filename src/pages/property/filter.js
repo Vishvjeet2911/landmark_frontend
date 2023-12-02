@@ -69,7 +69,7 @@ export default function Filter(props) {
         } else {
             setStateData(states)
         }
-    }, [account?.state_id])
+    }, [account?.state_id, states])
 
 
     const handleCity = (id) => {
@@ -85,7 +85,7 @@ export default function Filter(props) {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={6} lg={6} >
-                <Autocomplete
+                {stateData && <Autocomplete
                     id="state"
                     options={stateData}
                     value={selectedState}
@@ -104,7 +104,7 @@ export default function Filter(props) {
                             placeholder="States"
                         />
                     )}
-                />
+                />}
             </Grid>
 
             <Grid item xs={12} md={6} lg={6} >

@@ -72,7 +72,7 @@ export default function RoleAdd(props) {
                 },
                 body: JSON.stringify(initialValues),
             };
-            console.log(initialValues.state_id)
+            // console.log(initialValues.state_id)
             fetch(`${process.env.REACT_APP_SITE_URL}user`, requestOptions)
                 .then((response) => response.json())
                 .then((data) => {

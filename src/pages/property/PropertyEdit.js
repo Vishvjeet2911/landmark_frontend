@@ -21,12 +21,13 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // ----------------------------------------------------------------------
 
 const editorConfiguration = {
-    toolbar: ['bold', 'italic', 'heading', '|', 'outdent', 'indent', '|', 'bulletedList', 'numberedList', '|','typography',]
+    toolbar: ['bold', 'italic', 'heading', '|', 'outdent', 'indent', '|', 'bulletedList', 'numberedList', '|', 'typography',]
 };
 export default function LocationAdd() {
     const navigate = useNavigate();
     const accessToken = localStorage.getItem('lm_token')
     const location = useLocation();
+    const fileInputRef = useRef(null);
     const [btnLoad, setbtnLoad] = useState(false);
     const [stateData, setStateData] = useState([])
     const [cityData, setCityData] = useState([])
@@ -104,6 +105,13 @@ export default function LocationAdd() {
             updatedImages.splice(index, 1); // Remove one element at the specified index
             return updatedImages;
         });
+    };
+    const onDeleteMainImage = () => {
+        setCroppedImageUrl(null)
+        setSrc(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const { getRootProps, getInputProps } = useDropzone({ onDrop })
@@ -244,34 +252,46 @@ export default function LocationAdd() {
         setCrop(crop);
     };
 
+    const blobToBase64 = (blob) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = () => {
+                reject(new Error('Error reading Blob as base64'));
+            };
+            reader.readAsDataURL(blob);
+        });
+    };
+
     const makeClientCrop = async (crop) => {
         if (imageRef.current && crop.width && crop.height) {
-            const newCroppedBlobUrl = await getCroppedImg(
+            const newCroppedImageUrl = await getCroppedImg(
                 imageRef.current,
                 crop,
                 "newFile.jpeg"
             );
-            fetch(newCroppedBlobUrl)
-                .then((response) => response.blob())
-                .then((blob) => {
-                    // Convert the fetched Blob to base64
-                    const reader = new FileReader();
-
-                    reader.onload = (e) => {
-                        const base64CroppedImage = e.target.result;
-
-                        // Now you have the base64 representation of the cropped image
-                        setCroppedImageUrl(base64CroppedImage);
-                    };
-
-                    reader.readAsDataURL(blob);
-                })
-                .catch((error) => {
-                    console.error("Error fetching Blob data:", error);
-                });
+            if (newCroppedImageUrl.startsWith('blob:')) {
+                fetch(newCroppedImageUrl)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        // Convert Blob to base64
+                        return blobToBase64(blob);
+                    })
+                    .then((base64String) => {
+                        // Set the base64 image as the state
+                        setCroppedImageUrl('data:image/jpeg;base64,' + base64String);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                setCroppedImageUrl(newCroppedImageUrl);
+            }
         }
     };
-
     const getCroppedImg = (image, crop, fileName) => {
         const canvas = document.createElement("canvas");
         const scaleX = image.naturalWidth / image.width;
@@ -305,7 +325,6 @@ export default function LocationAdd() {
         });
     };
 
-    console.log(src, croppedImageUrl)
     return (
         <Container>
             <FormikProvider value={formik}>
@@ -451,6 +470,8 @@ export default function LocationAdd() {
                                 fullWidth
                                 autoComplete="owner_remarks"
                                 type="text"
+                                multiline
+                                rows={4}
                                 variant="outlined"
                                 label="Owner Remarks"
                                 {...getFieldProps('owner_remarks')}
@@ -617,6 +638,13 @@ export default function LocationAdd() {
                                                 <img alt="Crop" style={{ maxWidth: "200px" }} src={croppedImageUrl} />
                                             )}
                                         </Grid>
+                                        {(src || croppedImageUrl) &&
+                                            <IconButton
+                                                color="error"
+                                                onClick={() => onDeleteMainImage()}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -810,6 +838,8 @@ export default function LocationAdd() {
                                 type="text"
                                 variant="outlined"
                                 label="Existing Tenants"
+                                multiline
+                                rows={4}
                                 {...getFieldProps('exist_tenants')}
                                 error={Boolean(touched.exist_tenants && errors.exist_tenants)}
                                 helperText={touched.exist_tenants && errors.exist_tenants}
@@ -858,6 +888,8 @@ export default function LocationAdd() {
                                 fullWidth
                                 type="text"
                                 variant="outlined"
+                                multiline
+                                rows={4}
                                 label="Remarks : Owner's Scope of Work - Floor wise"
                                 {...getFieldProps('remarks')}
                                 error={Boolean(touched.remarks && errors.remarks)}
@@ -869,6 +901,8 @@ export default function LocationAdd() {
                                 fullWidth
                                 type="text"
                                 variant="outlined"
+                                multiline
+                                rows={4}
                                 label="Other Remarks"
                                 {...getFieldProps('other_remarks')}
                                 error={Boolean(touched.other_remarks && errors.other_remarks)}

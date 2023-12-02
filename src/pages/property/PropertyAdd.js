@@ -21,10 +21,11 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 // ----------------------------------------------------------------------
 
 const editorConfiguration = {
-    toolbar: ['bold', 'italic', 'heading', '|', 'outdent', 'indent', '|', 'bulletedList', 'numberedList', '|','typography',]
+    toolbar: ['bold', 'italic', 'heading', '|', 'outdent', 'indent', '|', 'bulletedList', 'numberedList', '|', 'typography',]
 };
 export default function PropertyAdd() {
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
     const token = localStorage.getItem('lm_token')
     const [btnLoad, setbtnLoad] = useState(false);
     const [src, setSrc] = useState(null);
@@ -91,6 +92,13 @@ export default function PropertyAdd() {
             updatedImages.splice(index, 1); // Remove one element at the specified index
             return updatedImages;
         });
+    };
+    const onDeleteMainImage = () => {
+        setCroppedImageUrl(null)
+        setSrc(null)
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
 
@@ -233,7 +241,19 @@ export default function PropertyAdd() {
     const onCropChange = (crop, percentCrop) => {
         setCrop(crop);
     };
-
+    const blobToBase64 = (blob) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = () => {
+                reject(new Error('Error reading Blob as base64'));
+            };
+            reader.readAsDataURL(blob);
+        });
+    };
     const makeClientCrop = async (crop) => {
         if (imageRef.current && crop.width && crop.height) {
             const newCroppedImageUrl = await getCroppedImg(
@@ -241,7 +261,23 @@ export default function PropertyAdd() {
                 crop,
                 "newFile.jpeg"
             );
-            setCroppedImageUrl(newCroppedImageUrl);
+            if (newCroppedImageUrl.startsWith('blob:')) {
+                fetch(newCroppedImageUrl)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        // Convert Blob to base64
+                        return blobToBase64(blob);
+                    })
+                    .then((base64String) => {
+                        // Set the base64 image as the state
+                        setCroppedImageUrl('data:image/jpeg;base64,' + base64String);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                setCroppedImageUrl(newCroppedImageUrl);
+            }
         }
     };
 
@@ -430,6 +466,8 @@ export default function PropertyAdd() {
                                 autoComplete="owner_remarks"
                                 type="text"
                                 variant="outlined"
+                                multiline
+                                rows={4}
                                 value={values?.owner_remarks}
                                 label="Owner Remarks"
                                 {...getFieldProps('owner_remarks')}
@@ -567,7 +605,7 @@ export default function PropertyAdd() {
                                     <label>Main Image</label>
                                     <Button variant="contained" type="button" style={{ width: '100%' }} size="large" component="label">
                                         Image Upload
-                                        <input hidden type="file" accept="image/*" onChange={onSelectFile1} />
+                                        <input hidden ref={fileInputRef} type="file" accept="image/*" onChange={onSelectFile1} />
                                         {/* <input hidden accept="image/*" type="file" onChange={(e) => onSelectFile(e)} /> */}
                                     </Button>
                                 </Grid>
@@ -593,6 +631,13 @@ export default function PropertyAdd() {
                                                 <img alt="Crop" style={{ maxWidth: "200%" }} src={croppedImageUrl} />
                                             )}
                                         </Grid>
+                                        {(src || croppedImageUrl) &&
+                                            <IconButton
+                                                color="error"
+                                                onClick={() => onDeleteMainImage()}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -786,6 +831,8 @@ export default function PropertyAdd() {
                                 type="text"
                                 variant="outlined"
                                 label="Existing Tenants"
+                                multiline
+                                rows={4}
                                 {...getFieldProps('exist_tenants')}
                                 error={Boolean(touched.exist_tenants && errors.exist_tenants)}
                                 helperText={touched.exist_tenants && errors.exist_tenants}
@@ -833,6 +880,8 @@ export default function PropertyAdd() {
                             <TextField
                                 fullWidth
                                 type="text"
+                                multiline
+                                rows={4}
                                 variant="outlined"
                                 label="Remarks : Owner's Scope of Work - Floor wise"
                                 {...getFieldProps('remarks')}
@@ -844,6 +893,8 @@ export default function PropertyAdd() {
                             <TextField
                                 fullWidth
                                 type="text"
+                                multiline
+                                rows={4}
                                 variant="outlined"
                                 label="Other Remarks"
                                 {...getFieldProps('other_remarks')}

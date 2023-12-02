@@ -153,7 +153,6 @@ export default function Task() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const handleDelete = (id) => {
-    console.log('delete')
     const requestOptions = {
       method: 'DELETE',
       headers: {
@@ -164,7 +163,6 @@ export default function Task() {
     fetch(`${process.env.REACT_APP_SITE_URL}role/${id}`, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
         toast.success('Delete Successfully')
         const newArray = showData.filter((item) => (
           item._id !== id

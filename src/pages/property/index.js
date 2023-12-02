@@ -170,7 +170,7 @@ export default function Property() {
     await fetch(`${process.env.REACT_APP_SITE_URL}property/state-city`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data?.data)
+        // console.log(data?.data)
         setStateData(data?.data?.states)
       });
       setLoader(false)

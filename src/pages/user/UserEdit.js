@@ -39,7 +39,7 @@ export default function RoleAdd(props) {
             .then((response) => response.json())
             .then((data) => {
                 setRoleData(data?.data?.roles)
-                console.log(data?.data?.states)
+                // console.log(data?.data?.states)
                 setStateData(data?.data?.states)
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
