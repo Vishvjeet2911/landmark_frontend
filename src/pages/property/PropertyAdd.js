@@ -461,7 +461,7 @@ export default function PropertyAdd() {
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} mt={2}>
-                            <TextField
+                            {/* <TextField
                                 fullWidth
                                 autoComplete="owner_remarks"
                                 type="text"
@@ -473,6 +473,19 @@ export default function PropertyAdd() {
                                 {...getFieldProps('owner_remarks')}
                                 error={Boolean(touched.owner_remarks && errors.owner_remarks)}
                                 helperText={touched.owner_remarks && errors.owner_remarks}
+                            /> */}
+                            <label>Owner Remarks</label>
+                            <CKEditor
+                                data={values.owner_remarks}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("owner_remarks", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                     </Grid>
@@ -826,7 +839,7 @@ export default function PropertyAdd() {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
+                            {/* <TextField
                                 fullWidth
                                 type="text"
                                 variant="outlined"
@@ -836,6 +849,19 @@ export default function PropertyAdd() {
                                 {...getFieldProps('exist_tenants')}
                                 error={Boolean(touched.exist_tenants && errors.exist_tenants)}
                                 helperText={touched.exist_tenants && errors.exist_tenants}
+                            /> */}
+                            <label>Existing Tenants</label>
+                            <CKEditor
+                                data={values.exist_tenants}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("exist_tenants", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
@@ -877,7 +903,7 @@ export default function PropertyAdd() {
                             /> */}
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
+                            {/* <TextField
                                 fullWidth
                                 type="text"
                                 multiline
@@ -887,10 +913,23 @@ export default function PropertyAdd() {
                                 {...getFieldProps('remarks')}
                                 error={Boolean(touched.remarks && errors.remarks)}
                                 helperText={touched.remarks && errors.remarks}
+                            /> */}
+                            <label>Remarks : Owner's Scope of Work - Floor wise</label>
+                            <CKEditor
+                                data={values.remarks}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("remarks", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} md={6} lg={6} >
-                            <TextField
+                            {/* <TextField
                                 fullWidth
                                 type="text"
                                 multiline
@@ -900,6 +939,19 @@ export default function PropertyAdd() {
                                 {...getFieldProps('other_remarks')}
                                 error={Boolean(touched.other_remarks && errors.other_remarks)}
                                 helperText={touched.other_remarks && errors.other_remarks}
+                            /> */}
+                            <label>Other Remarks</label>
+                            <CKEditor
+                                data={values.other_remarks}
+                                editor={ClassicEditor}
+                                config={editorConfiguration}
+                                onChange={(event, editor) => {
+                                    const data = editor.getData();
+                                    setFieldValue("other_remarks", data)
+                                }}
+                                onFocus={(event, editor) => {
+                                    // console.log('Focus.', editor);
+                                }}
                             />
                         </Grid>
 

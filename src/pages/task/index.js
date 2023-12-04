@@ -25,7 +25,13 @@ import {
   TablePagination,
   Pagination
 } from '@mui/material';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FilterPopup from './filter';
 // components
+import Moment from 'moment';
 import Popup from '../../components/Popup'
 import TaskAdd from './TaskAdd'
 import Iconify from '../../components/iconify';
@@ -70,6 +76,12 @@ export default function Task() {
   const [size] = useState(15);
   const [totalItems, setTotalItems] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [filters, setFilters] = useState({
+    task_name: '',
+    assigned_by: '',
+    assigned_to: '',
+  });
+  const [onFilter, setOnFilters] = useState(false);
   const setOpenPopup = () => {
     setOpen((add) => !add);
   };
@@ -102,7 +114,7 @@ export default function Task() {
           'Authorization': `Bearer ${token}`
         },
       };
-      fetch(`${process.env.REACT_APP_SITE_URL}task`, requestOptions)
+      fetch(`${process.env.REACT_APP_SITE_URL}task?&task_name=${filters?.task_name}&assigned_by=${filters?.assigned_by}&assigned_to=${filters?.assigned_to}`, requestOptions)
         .then(response => response.json())
         .then(data => {
           setLoader(false)
@@ -170,7 +182,10 @@ export default function Task() {
     getAllUsers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
- 
+  if (onFilter === true) {
+    callApi();
+    setOnFilters(false);
+  }
 
   const handleEditClick = (row) => {
     setEditData(row)
@@ -202,9 +217,20 @@ export default function Task() {
         draggable
         pauseOnHover
       />
-      <Helmet>
-        <title> Task </title>
-      </Helmet>
+      <Stack mb={3}>
+        <Accordion sx={{ border: '1px solid #37474f' }}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography variant="h6">Filter</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <FilterPopup setFilters={setFilters} onFilter={setOnFilters} />
+          </AccordionDetails>
+        </Accordion>
+      </Stack>
       {permission_check('task_view') ? loader ?
         <Grid sx={{ width: '100%', height: '100vh', textAlign: 'center' }} ><CircularProgress sx={{ color: '#c5c7cf', margin: '0 auto', marginTop: '40%' }} /></Grid> :
         <Container maxWidth="xl">
@@ -231,6 +257,7 @@ export default function Task() {
                       <StyledTableCell >Assigned to</StyledTableCell>
                       <StyledTableCell >Comments</StyledTableCell>
                       <StyledTableCell >Status</StyledTableCell>
+                      <StyledTableCell >Last Updated</StyledTableCell>
                       <StyledTableCell >Action</StyledTableCell>
                     </TableRow>
                   </TableHead>
@@ -242,13 +269,14 @@ export default function Task() {
                         <StyledTableCell >{row?.assignedByUser?.email}</StyledTableCell>
                         <StyledTableCell >{row?.assignedToUser?.email}</StyledTableCell>
                         <StyledTableCell > {row?.comments?.split('||').map((element, index) => (
-                           <Typography key={index} variant="body2" sx={{marginLeft:'10px', flexWrap: 'wrap', wordWrap: 'break-word' }} >  {element}</Typography>))}</StyledTableCell>
+                          <Typography key={index} variant="body2" sx={{ marginLeft: '10px', flexWrap: 'wrap', wordWrap: 'break-word' }} >  {element}</Typography>))}</StyledTableCell>
                         <StyledTableCell sx={{ color: colorCoding(row?.status) }}>{row?.status}</StyledTableCell>
+                        <StyledTableCell >{new Moment(new Date(row.updatedAt)).format('DD-MM-yyyy')}</StyledTableCell>
                         <StyledTableCell >
                           {permission_check('task_edit') ? <IconButton onClick={() => handleEditClick(row)}>
                             <Iconify sx={{ color: 'blue' }} icon={'eva:edit-fill'} />
                           </IconButton> : ''}
-                          {permission_check('task_delete') ?  <IconButton onClick={() => handleDelete(row?.id)}>
+                          {permission_check('task_delete') ? <IconButton onClick={() => handleDelete(row?.id)}>
                             <Iconify sx={{ color: '#db0011' }} icon={'eva:trash-2-outline'} />
                           </IconButton> : ''}
                         </StyledTableCell>

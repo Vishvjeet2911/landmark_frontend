@@ -144,7 +144,7 @@ export default function TaskAdd(props) {
                         id="tags-standard"
                         options={props?.allUsers}
                         value={selectedPeople}
-                        getOptionLabel={(option) => option?.email || ''}
+                        getOptionLabel={(option) => option?.name || ''}
                         defaultValue={props?.allUsers.find((option) => option?.id === values?.assigned_to) || null}
                         onChange={(event, newValue) => {
                             setSelectedPeople(newValue)

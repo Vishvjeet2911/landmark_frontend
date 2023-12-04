@@ -126,7 +126,7 @@ export default function TaskAdd(props) {
                         // multiple
                         id="tags-standard"
                         options={props.allUsers}
-                        getOptionLabel={(option) => option?.email || ''}
+                        getOptionLabel={(option) => option?.name|| ''}
                         onChange={(event, newValue) => {
                             setSelectedPeople(newValue)
                             // const resp = newValue.map(item => item?.id)
